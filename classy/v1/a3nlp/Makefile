@@ -14,13 +14,14 @@
 
 PROJECT_NAME := bobsknobshop
 MODULE_NAME := classy
-VERSION := v1
+VERSION := v1_a3nlp
 
 # Docker-related
 IMAGE_NAME := $(PROJECT_NAME)_$(MODULE_NAME)_$(VERSION)
 TAG := latest
 
-LOCAL_PORT := 9000
+LOCAL_PORT := 9003
+NODE_PORT := 30003
 
 .PHONY:
 
