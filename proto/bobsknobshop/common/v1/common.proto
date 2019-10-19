@@ -31,12 +31,12 @@ message Comment {
     // Unique name for comment.
     string name = 1;
 
-    // The comment body.
-    string text = 2;
+    // Timestamp comment was recorded.
+    int64 created_on = 2;
 
     // The name of the author of the comment.
-    string author = 3;
+    string author = 4;
 
-    // Timestamp comment was recorded.
-    int64 created_on = 4;
+    // The comment body.
+    string text = 3;
 }

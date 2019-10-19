@@ -32,17 +32,7 @@ option go_package = "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1;clas
 // A service for classifying things.
 service Classy {
 
-    // Classifies a given comment
-    rpc ClassifyComment(ClassifyCommentRequest) returns (ClassifyResponse) {
+    // Returns a classification for a comment
+    rpc ClassifyComment(common.v1.Comment) returns (Classification) {
     }
-}
-
-
-message ClassifyCommentRequest {
-
-    // The comment to classify.
-    common.v1.Comment comment = 1;
-
-    // Optional meta data.
-    ClassifyMeta meta = 99;
 }
