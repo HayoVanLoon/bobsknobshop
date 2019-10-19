@@ -41,6 +41,6 @@ func (s serviceImplementation) Service() string {
 	return s.parentName + "-" + s.parentVersion + "-service-" + s.name
 }
 
-func NewServiceImplementationDetails(parentName, parentVersion, name string, port int, active bool) ServiceImplementation {
+func NewServiceImplementation(parentName, parentVersion, name string, port int, active bool) ServiceImplementation {
 	return serviceImplementation{parentName, parentVersion, name, port, active}
 }
