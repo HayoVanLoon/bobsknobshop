@@ -20,18 +20,23 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/HayoVanLoon/bobsknobshop/common"
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1"
+	commonpb "github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
+	"strconv"
 )
 
 const (
-	defaultPort = "8080"
-	maxRetries  = 3
+	defaultPort = 9000
+	self        = "classy-v1"
 )
+
+var implementations = map[string]common.ServiceImplementation{}
 
 type server struct {
 	services map[string]string
@@ -41,15 +46,15 @@ func newServer(services map[string]string) *server {
 	return &server{services}
 }
 
-//// Provides a storage client
-//func (s server) getStorageClient() (storagepb.StorageClient, func(), error) {
-//	conn, err := s.getConn(storageService)
-//	if err != nil {
-//		log.Print("ERROR: could not open connection to storage")
-//		return nil, nil, err
-//	}
-//	return storagepb.NewStorageClient(conn), closeConnFn(conn), err
-//}
+// Provides a sub-service  client
+func (s server) getSubServiceClient(version string) (pb.ClassyClient, func(), error) {
+	conn, err := s.getConn(implementations[version].Service())
+	if err != nil {
+		log.Print("ERROR: could not open connection to storage")
+		return nil, nil, err
+	}
+	return pb.NewClassyClient(conn), closeConnFn(conn), err
+}
 
 // Provides a connection-closing function
 func closeConnFn(conn *grpc.ClientConn) func() {
@@ -69,15 +74,32 @@ func (s server) getConn(service string) (*grpc.ClientConn, error) {
 	return conn, nil
 }
 
-func (s server) ClassifyComment(ctx context.Context, r *pb.ClassifyCommentRequest) (*pb.ClassifyResponse, error) {
-	return &pb.ClassifyResponse{Category: int32(len(r.Comment.Text))}, nil
+func (s server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (resp *pb.Classification, err error) {
+
+	cl, cls, err := s.getSubServiceClient("a3nlp")
+	if err != nil {
+		return nil, err
+	}
+	defer cls()
+
+	resp, err = cl.ClassifyComment(ctx, r)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: store response
+	// TODO: store metadata
+
+	return resp, nil
 }
 
 func main() {
-	var port = flag.String("port", defaultPort, "port to listen on")
+	var port = flag.Int("port", defaultPort, "port to listen on")
 	flag.Parse()
 
-	lis, err := net.Listen("tcp", ":"+*port)
+	implementations["a3nlp"] = common.NewServiceImplementation(self, "v1", "a3nlp", *port+3, true)
+
+	lis, err := net.Listen("tcp", ":"+strconv.Itoa(*port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}

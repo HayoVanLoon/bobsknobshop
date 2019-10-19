@@ -14,7 +14,10 @@ cloud.google.com/go/storage v1.0.0/go.mod h1:IhtSnM/ZTZV8YYJWCY8RULGVqBDmpoyjwiy
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/HayoVanLoon/bobsknobshop v0.0.0-20191019114231-3943e03c61c1 h1:auu+t3xSVgRRvE0FAvGZRP8wzRYOrxhYfk10d/lCanQ=
+github.com/HayoVanLoon/genproto v0.0.0-20191019105559-bf5ca3c2487d h1:6HNxurIE30rU8HnjgIZ1Yod/i+GTS0pXp1Add0otCeU=
+github.com/HayoVanLoon/genproto v0.0.0-20191019105559-bf5ca3c2487d/go.mod h1:HLABCVtqGSsmACp1a8Bd9y3W3G9UUx668TEks1kc7AE=
+github.com/HayoVanLoon/genproto v0.0.0-20191019162249-ade540cc2ec4 h1:+2xGkLXrYpB5z8AdUDBw6+L08xqZRzvzBT6bq5bfjr8=
+github.com/HayoVanLoon/genproto v0.0.0-20191019162249-ade540cc2ec4/go.mod h1:HLABCVtqGSsmACp1a8Bd9y3W3G9UUx668TEks1kc7AE=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
 github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b/go.mod h1:SBH7ygxi8pfUlaOkMMuAQtPIUF8ecWP5IEl/CR7VP2Q=
