@@ -23,6 +23,7 @@ export PYTHON27_EXEC=$(which python2.7)
 export PYTHON35P_EXEC=$(which python3.6)
 export VENV_EXEC=$(which virtualenv)
 export PROTO_GOOGLE_APIS=
+export MAKE=$(which make)
 export PROTOC_EXEC=$(which protoc)
 
 
