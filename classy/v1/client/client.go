@@ -25,25 +25,24 @@ import (
 	commonpb "github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
 	"google.golang.org/grpc"
 	"log"
+	"strconv"
 	"time"
 )
 
 const (
 	defaultHost = "localhost"
-	defaultPort = "8080"
+	defaultPort = 9000
 )
 
-func getConn(host, port string) (*grpc.ClientConn, error) {
-	conn, err := grpc.Dial(host+":"+port, grpc.WithInsecure())
+func getConn(host string, port int) (*grpc.ClientConn, error) {
+	conn, err := grpc.Dial(host+":"+strconv.Itoa(port), grpc.WithInsecure())
 	if err != nil {
 		return nil, fmt.Errorf("did not connect: %v", err)
 	}
 	return conn, nil
 }
 
-func createMessage(host, port string, c *commonpb.Comment) error {
-	r := &pb.ClassifyCommentRequest{Comment: c}
-
+func createMessage(host string, port int, c *commonpb.Comment) error {
 	conn, err := getConn(host, port)
 	defer func() {
 		if err := conn.Close(); err != nil {
@@ -56,7 +55,7 @@ func createMessage(host, port string, c *commonpb.Comment) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	resp, err := cl.ClassifyComment(ctx, r)
+	resp, err := cl.ClassifyComment(ctx, c)
 
 	log.Printf("%v\n", resp)
 	if err != nil {
@@ -66,12 +65,10 @@ func createMessage(host, port string, c *commonpb.Comment) error {
 	return err
 }
 
-// Makes several calls to a messaging server.
-//
 // Meant for debugging purposes.
 func main() {
-	var host = flag.String("host", defaultHost, "messaging service host")
-	var port = flag.String("port", defaultPort, "messaging service port")
+	var host = flag.String("host", defaultHost, "service host")
+	var port = flag.Int("port", defaultPort, "service port")
 	flag.Parse()
 
 	question := &commonpb.Comment{
