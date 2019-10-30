@@ -26,6 +26,7 @@ import (
 	"log"
 	"net"
 	"strconv"
+	"time"
 )
 
 const (
@@ -38,7 +39,15 @@ type server struct {
 }
 
 func (s server) GetServiceKpi(context.Context, *pb.GetServiceKpiRequest) (*pb.GetServiceKpiResponse, error) {
-	resp := &pb.GetServiceKpiResponse{}
+	resp := &pb.GetServiceKpiResponse{
+		Versions: []*pb.GetServiceKpiResponse_Version{{
+			Name:           "all",
+			StartTimestamp: time.Now().Unix() - 24*time.Hour.Milliseconds(),
+			EndTimestamp:   time.Now().Unix(),
+			Unit:           "cabages",
+			Value:          2,
+		}},
+	}
 	return resp, nil
 }
 
