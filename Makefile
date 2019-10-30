@@ -39,6 +39,9 @@ run-classy:
 run-peddler:
 	$(MAKE) -C peddler run
 
+smoke-test-peddler:
+	@$(MAKE) -C peddler smoke-test
+
 
 # Truth
 clean-truth:
