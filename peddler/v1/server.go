@@ -18,20 +18,21 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"flag"
 	"github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/peddler/v1"
-	"github.com/google/uuid"
-	"google.golang.org/genproto/googleapis/type/money"
+	"github.com/golang/protobuf/jsonpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"io/ioutil"
 	"log"
 	"net"
 	"sort"
 	"strconv"
 	"strings"
-	"time"
 )
 
 const (
@@ -40,42 +41,26 @@ const (
 	version     = "v1"
 )
 
-func amount(a int64, b int32) *money.Money {
-	return &money.Money{CurrencyCode: "EUR", Units: a, Nanos: b}
-}
-
-func orderLine(sku string, q int32, t *money.Money) *common.Order_OrderLine {
-	return &common.Order_OrderLine{
-		Name:     uuid.New().String(),
-		Sku:      sku,
-		Quantity: q,
-		Total:    t,
-	}
-}
-
-func order(c string, m *money.Money, os []*common.Order_OrderLine) common.Order {
-	return common.Order{
-		Name:       uuid.New().String(),
-		CreatedOn:  time.Now().Unix(),
-		Client:     c,
-		Total:      m,
-		OrderLines: os,
-	}
-}
-
 func createOrders() []common.Order {
-	orders := []common.Order{
-		order("Alice", amount(5, 0), []*common.Order_OrderLine{
-			orderLine("123-456-789-0-1", 1, amount(6, 0)),
-		}),
-		order("Alice", amount(5, 0), []*common.Order_OrderLine{
-			orderLine("123-456-789-0-1", 1, amount(6, 0)),
-		}),
+	bs, err := ioutil.ReadFile("data.json")
+	if err != nil {
+		panic(err.Error())
 	}
-	sort.Slice(orders, func(i, j int) bool {
-		return orders[i].Name < orders[j].Name
-	})
-	return orders
+	r := bytes.NewReader(bs)
+	dec := json.NewDecoder(r)
+
+	var os []common.Order
+
+	for dec.More() {
+		o := common.Order{}
+		err = jsonpb.UnmarshalNext(dec, &o)
+		if err != nil {
+			panic(err.Error())
+		}
+		os = append(os, o)
+	}
+
+	return os
 }
 
 var orders = createOrders()
@@ -94,13 +79,13 @@ func (s server) SearchOrders(ctx context.Context, r *pb.SearchOrdersRequest) (*p
 	sort.Slice(ps, func(i, j int) bool { return ps[i] < ps[j] })
 
 	var os []*common.Order
-	for _, o := range orders {
+	for i, o := range orders {
 		added := false
 		oc := strings.ToUpper(o.Client)
 		for _, c := range cs {
 			if oc == strings.ToUpper(c) {
 				added = true
-				os = append(os, &o)
+				os = append(os, &orders[i])
 				break
 			}
 		}
@@ -112,7 +97,7 @@ func (s server) SearchOrders(ctx context.Context, r *pb.SearchOrdersRequest) (*p
 			for _, ol := range o.GetOrderLines() {
 				if p == strings.ToUpper(ol.Sku) {
 					added = true
-					os = append(os, &o)
+					os = append(os, &orders[i])
 					break
 				}
 			}

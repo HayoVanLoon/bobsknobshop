@@ -41,9 +41,10 @@ func getConn(host string, port int) (*grpc.ClientConn, error) {
 	return conn, nil
 }
 
-func createMessage(host string, port int, c string) error {
+func createMessage(host string, port int, c string, ps []string) error {
 	r := &pb.SearchOrdersRequest{
-		Customer: []string{c},
+		Customer:  []string{c},
+		ProductId: ps,
 	}
 
 	conn, err := getConn(host, port)
@@ -74,6 +75,11 @@ func main() {
 	var port = flag.Int("port", defaultPort, "service port")
 	flag.Parse()
 
-	_ = createMessage(*host, *port, "Alice")
-	_ = createMessage(*host, *port, "Cathy")
+	fmt.Print("\n")
+	_ = createMessage(*host, *port, "Alice", []string{})
+	fmt.Print("\n")
+	_ = createMessage(*host, *port, "Cathy", []string{})
+	fmt.Print("\n")
+	_ = createMessage(*host, *port, "", []string{"123-456-789-0-1"})
+	fmt.Print("\n")
 }

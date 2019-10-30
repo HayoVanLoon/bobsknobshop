@@ -20,7 +20,7 @@ VERSION := v1
 IMAGE_NAME := $(PROJECT_NAME)_$(MODULE_NAME)_$(VERSION)
 TAG := latest
 
-LOCAL_PORT := 9010
+LOCAL_PORT := 9020
 
 .PHONY:
 
@@ -38,6 +38,10 @@ build:
 
 run:
 	go run server.go \
+		-port=$(LOCAL_PORT)
+
+smoke-test:
+	go run client/client.go \
 		-port=$(LOCAL_PORT)
 
 docker-run:
