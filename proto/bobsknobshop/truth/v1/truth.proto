@@ -36,9 +36,11 @@ service Truth {
 
 message GetServiceKpiRequest {
 
-    int64 start_timestamp = 1;
+    string service = 1;
 
-    int64 end_timestamp = 2;
+    int64 start_timestamp = 2;
+
+    int64 end_timestamp = 3;
 }
 
 message GetServiceKpiResponse {

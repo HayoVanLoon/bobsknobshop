@@ -24,25 +24,26 @@ import (
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/truth/v1"
 	"google.golang.org/grpc"
 	"log"
+	"strconv"
 	"time"
 )
 
 const (
 	defaultHost = "localhost"
-	defaultPort = "8080"
+	defaultPort = 9000
 )
 
-func getConn(host, port string) (*grpc.ClientConn, error) {
-	conn, err := grpc.Dial(host+":"+port, grpc.WithInsecure())
+func getConn(host string, port int) (*grpc.ClientConn, error) {
+	conn, err := grpc.Dial(host+":"+strconv.Itoa(port), grpc.WithInsecure())
 	if err != nil {
 		return nil, fmt.Errorf("did not connect: %v", err)
 	}
 	return conn, nil
 }
 
-func createMessage(host, port string, c string) error {
-	r := &pb.SearchOrdersRequest{
-		Customer: []string{c},
+func createMessage(host string, port int, s string) error {
+	r := &pb.GetServiceKpiRequest{
+		Service: s,
 	}
 
 	conn, err := getConn(host, port)
@@ -52,12 +53,12 @@ func createMessage(host, port string, c string) error {
 		}
 	}()
 
-	cl := pb.NewPeddlerClient(conn)
+	cl := pb.NewTruthClient(conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	resp, err := cl.SearchOrders(ctx, r)
+	resp, err := cl.GetServiceKpi(ctx, r)
 
 	log.Printf("%v\n", resp)
 	if err != nil {
@@ -67,12 +68,10 @@ func createMessage(host, port string, c string) error {
 	return err
 }
 
-// Makes several calls to a messaging server.
-//
 // Meant for debugging purposes.
 func main() {
 	var host = flag.String("host", defaultHost, "service host")
-	var port = flag.String("port", defaultPort, "service port")
+	var port = flag.Int("port", defaultPort, "service port")
 	flag.Parse()
 
 	_ = createMessage(*host, *port, "Alice")
