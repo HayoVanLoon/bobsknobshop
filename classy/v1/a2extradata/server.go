@@ -18,57 +18,52 @@
 package main
 
 import (
-	"cloud.google.com/go/language/apiv1"
 	"flag"
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1"
 	"github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
 	"golang.org/x/net/context"
-	languagepb "google.golang.org/genproto/googleapis/cloud/language/v1"
-	"google.golang.org/genproto/googleapis/cloud/support/common"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
+	"unicode"
 )
 
 const (
-	defaultPort         = "9000"
-	questionThreshold   = 0
-	complimentThreshold = .6
+	defaultPort = "9000"
 )
 
 type server struct {
 }
 
 func (s *server) ClassifyComment(ctx context.Context, r *common.Comment) (*pb.Classification, error) {
-	client, err := language.NewClient(ctx)
-	if err != nil {
-		log.Printf("error: failed to create nlp client: %v", err)
-		return nil, err
-	}
+	qc := 0
+	ec := 0
+	emo := 0
+	lst := '.'
+	for _, c := range r.Text {
+		if c == '?' {
+			qc += 1
+		} else if c == '!' {
+			ec += 1
+		} else if unicode.IsUpper(c) && !unicode.IsPunct(lst) {
+			emo += 1
+		}
 
-	sentiment, err := client.AnalyzeSentiment(ctx, &languagepb.AnalyzeSentimentRequest{
-		Document: &languagepb.Document{
-			Source: &languagepb.Document_Content{Content: r.Text},
-			Type:   languagepb.Document_PLAIN_TEXT,
-		},
-		EncodingType: languagepb.EncodingType_UTF8,
-	})
-	if err != nil {
-		log.Printf("warning: failed to analyze text: %v", err)
-		return nil, err
+		if !unicode.IsSpace(c) {
+			lst = c
+		}
 	}
-	score := sentiment.DocumentSentiment.Score
-
-	log.Printf("info: message was scored with %v", score)
 
 	resp := &pb.Classification{}
-	if score < questionThreshold {
+	if ec > 0 && emo < 2 {
+		resp.Category = "compliment"
+	} else if emo > 2 {
 		resp.Category = "complaint"
-	} else if score < complimentThreshold {
+	} else if qc > 0 {
 		resp.Category = "question"
 	} else {
-		resp.Category = "compliment"
+		resp.Category = "comment"
 	}
 
 	return resp, nil

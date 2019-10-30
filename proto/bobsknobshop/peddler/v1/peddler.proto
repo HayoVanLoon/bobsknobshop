@@ -17,26 +17,33 @@
 
 syntax = "proto3";
 
-package bobsknobshop.classy.v1;
+package bobsknobshop.peddler.v1;
 
 import "google/api/annotations.proto";
 
+import "bobsknobshop/common/v1/common.proto";
+
 option java_multiple_files = true;
-option java_package = "gl.bobsknobshop.classy.v1";
-option go_package = "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1;classy";
+option java_package = "gl.bobsknobshop.peddler.v1";
+option go_package = "github.com/HayoVanLoon/genproto/bobsknobshop/peddler/v1;peddler";
 
 
-message Classification {
+// A service for classifying things.
+service Peddler {
 
-    // Unique resource name.
-    string name = 1;
+    // Returns a classification for a comment
+    rpc SearchOrders(SearchOrdersRequest) returns (SearchOrdersResponse) {
+    }
+}
 
-    // Creation timestamp.
-    int64 created_on = 2;
+message SearchOrdersRequest {
 
-    // The version of the service that did the prediction
-    string service_version = 3;
+    repeated string customer = 1;
 
-    // The predicted category.
-    string category = 4;
+    repeated string product_id = 2;
+}
+
+message SearchOrdersResponse {
+
+    repeated common.v1.Order orders = 1;
 }

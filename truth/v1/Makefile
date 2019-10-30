@@ -13,7 +13,7 @@
 # limitations under the License.
 
 PROJECT_NAME := bobsknobshop
-MODULE_NAME := classy
+MODULE_NAME := truth
 VERSION := v1
 
 # Docker-related

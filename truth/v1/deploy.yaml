@@ -12,25 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-GOPATH ?= $(HOME)/go
-GENPROTO_REPO ?= github.com/HayoVanLoon/bobsknobshop/genproto
+apiVersion: v1
+kind: Service
+metadata:
+  name: truth-v1-service
+spec:
+  selector:
+    app: truth-v1
+  ports:
+    - protocol: TCP
+      port: 9000
 
-GO_OUT_ESCAPED := $(shell echo $(GOPATH)/src/$(GENPROTO_REPO) | sed 's/\//\\\//g')
+---
 
-GO_PROTO_DIRS := $(shell find . -name '*.proto' | \
-	sed -E "s/^\.\/(.*)\/.*/$(GO_OUT_ESCAPED)\/\1/" | \
-	uniq)
-PROTO_FILES := $(shell find . -name '*.proto')
-
-
-clean-protoc:
-	rm -rf $(GO_PROTO_DIRS)
-
-protoc-go: clean-protoc
-	for FILE in $(PROTO_FILES); do \
-		protoc \
-			--go_out="plugins=grpc:$(GOPATH)/src" \
-			-I$(PROTO_GOOGLE_APIS) \
-			-I. \
-			$$FILE; \
-	done
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: truth-v1-deployment
+  labels:
+    app: truth-v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: truth-v1
+  template:
+    metadata:
+      labels:
+        app: truth-v1
+    spec:
+      containers:
+        - name: truth-v1
+          image: bobsknobshop_truth_v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 9000

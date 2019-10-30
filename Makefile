@@ -11,7 +11,9 @@ test: dev-env
 	# add specific recipes here as needed / convenient
 
 clean:
-	# add specific recipes here as needed / convenient
+	make -C classy clean
+	make -C peddler clean
+	make -C truth clean
 
 protoc:
 	# add specific recipes here as needed / convenient

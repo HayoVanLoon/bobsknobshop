@@ -19,7 +19,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/HayoVanLoon/bobsknobshop/common"
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1"
 	commonpb "github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
@@ -33,7 +32,8 @@ import (
 
 const (
 	defaultPort = 9000
-	self        = "classy-v1"
+	self        = "classy"
+	version     = "v1"
 )
 
 var implementations = map[string]common.ServiceImplementation{}
@@ -47,10 +47,9 @@ func newServer(services map[string]string) *server {
 }
 
 // Provides a sub-service  client
-func (s server) getSubServiceClient(version string) (pb.ClassyClient, func(), error) {
-	conn, err := s.getConn(implementations[version].Service())
+func (s server) getSubServiceClient(sub string) (pb.ClassyClient, func(), error) {
+	conn, err := s.getConn(implementations[sub].Service())
 	if err != nil {
-		log.Print("ERROR: could not open connection to storage")
 		return nil, nil, err
 	}
 	return pb.NewClassyClient(conn), closeConnFn(conn), err
@@ -69,7 +68,7 @@ func closeConnFn(conn *grpc.ClientConn) func() {
 func (s server) getConn(service string) (*grpc.ClientConn, error) {
 	conn, err := grpc.Dial(s.services[service], grpc.WithInsecure())
 	if err != nil {
-		return nil, fmt.Errorf("did not connect: %v", err)
+		return nil, err
 	}
 	return conn, nil
 }
@@ -97,7 +96,9 @@ func main() {
 	var port = flag.Int("port", defaultPort, "port to listen on")
 	flag.Parse()
 
-	implementations["a3nlp"] = common.NewServiceImplementation(self, "v1", "a3nlp", *port+3, true)
+	for i, n := range []string{"a1basic", "a2extradata", "a3nlp"} {
+		implementations[n] = common.NewServiceImplementation(self, version, n, *port+1+i, true)
+	}
 
 	lis, err := net.Listen("tcp", ":"+strconv.Itoa(*port))
 	if err != nil {

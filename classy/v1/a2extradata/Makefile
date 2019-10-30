@@ -14,18 +14,16 @@
 
 PROJECT_NAME := bobsknobshop
 MODULE_NAME := classy
-VERSION := v1
+VERSION := v1_a2extradata
 
 # Docker-related
 IMAGE_NAME := $(PROJECT_NAME)_$(MODULE_NAME)_$(VERSION)
 TAG := latest
 
-LOCAL_PORT := 9000
+LOCAL_PORT := 9002
+NODE_PORT := 30002
 
 .PHONY:
-
-clean:
-	go clean
 
 protoc:
 	@echo Go App, skipped

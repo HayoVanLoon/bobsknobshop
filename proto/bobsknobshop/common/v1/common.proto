@@ -19,6 +19,7 @@ syntax = "proto3";
 
 package bobsknobshop.common.v1;
 
+import "google/type/money.proto";
 import "google/api/annotations.proto";
 
 option java_multiple_files = true;
@@ -34,9 +35,45 @@ message Comment {
     // Timestamp comment was recorded.
     int64 created_on = 2;
 
+    // Topic the comment is aimed at
+    string topic = 3;
+
     // The name of the author of the comment.
     string author = 4;
 
     // The comment body.
-    string text = 3;
+    string text = 5;
+}
+
+
+message Order {
+
+    // Unique name for order.
+    string name = 1;
+
+    // Timestamp order was recorded.
+    int64 created_on = 2;
+
+    // Customer ID.
+    string client = 5;
+
+    // Order total
+    google.type.Money total = 6;
+
+    // The ordered items
+    repeated OrderLine order_lines = 7;
+
+    message OrderLine {
+        // Unique name for order.
+        string name = 1;
+
+        // Product ID.
+        string sku = 2;
+
+        // Number of items ordered.
+        int32 quantity = 3;
+
+        // Order line total.
+        google.type.Money total = 4;
+    }
 }

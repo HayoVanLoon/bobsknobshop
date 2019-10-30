@@ -17,39 +17,44 @@
 
 syntax = "proto3";
 
-package bobsknobshop.classy.v1;
+package bobsknobshop.truth.v1;
 
 import "google/api/annotations.proto";
 
-import "bobsknobshop/common/v1/common.proto";
-
 option java_multiple_files = true;
-option java_package = "gl.bobsknobshop.classy.v1";
-option go_package = "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1;classy";
+option java_package = "gl.bobsknobshop.truth.v1";
+option go_package = "github.com/HayoVanLoon/genproto/bobsknobshop/truth/v1;truth";
 
 
 // A service for classifying things.
-service Classy {
+service Truth {
 
     // Returns a classification for a comment
-    rpc ClassifyComment(common.v1.Comment) returns (Classification) {
+    rpc GetServiceKpi(GetServiceKpiRequest) returns (GetServiceKpiResponse) {
     }
 }
 
-message Classification {
+message GetServiceKpiRequest {
 
-    // Unique resource name.
-    string name = 1;
+    int64 start_timestamp = 1;
 
-    // Creation timestamp.
-    int64 created_on = 2;
+    int64 end_timestamp = 2;
+}
 
-    // The version of the service that did the prediction
-    string service_version = 3;
+message GetServiceKpiResponse {
 
-    // Comment ID.
-    string comment = 4;
+    repeated Version versions  = 1;
 
-    // The predicted category.
-    string category = 5;
+    message Version {
+
+        string name = 1;
+
+        int64 start_timestamp = 2;
+
+        int64 end_timestamp = 3;
+
+        string unit = 4;
+
+        float value = 5;
+    }
 }

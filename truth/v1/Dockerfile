@@ -12,25 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-GOPATH ?= $(HOME)/go
-GENPROTO_REPO ?= github.com/HayoVanLoon/bobsknobshop/genproto
+FROM golang:alpine AS builder
 
-GO_OUT_ESCAPED := $(shell echo $(GOPATH)/src/$(GENPROTO_REPO) | sed 's/\//\\\//g')
+RUN apk --update --no-cache add git protobuf
 
-GO_PROTO_DIRS := $(shell find . -name '*.proto' | \
-	sed -E "s/^\.\/(.*)\/.*/$(GO_OUT_ESCAPED)\/\1/" | \
-	uniq)
-PROTO_FILES := $(shell find . -name '*.proto')
+WORKDIR /go/src/app
 
+COPY . .
 
-clean-protoc:
-	rm -rf $(GO_PROTO_DIRS)
+RUN go get -d -v ./...
+RUN go install -v ./...
 
-protoc-go: clean-protoc
-	for FILE in $(PROTO_FILES); do \
-		protoc \
-			--go_out="plugins=grpc:$(GOPATH)/src" \
-			-I$(PROTO_GOOGLE_APIS) \
-			-I. \
-			$$FILE; \
-	done
+RUN ls /go/bin
+
+# Next stage
+FROM alpine
+
+RUN apk --update --no-cache add ca-certificates openssl
+
+COPY --from=builder /go/bin/app /usr/local/bin
+
+CMD ["/usr/local/bin/app"]
