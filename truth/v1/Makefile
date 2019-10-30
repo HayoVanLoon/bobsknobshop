@@ -20,7 +20,7 @@ VERSION := v1
 IMAGE_NAME := $(PROJECT_NAME)_$(MODULE_NAME)_$(VERSION)
 TAG := latest
 
-LOCAL_PORT := 9000
+LOCAL_PORT := 9030
 
 .PHONY:
 
@@ -40,6 +40,10 @@ run:
 	go run server.go \
 		-port=$(LOCAL_PORT)
 
+smoke-test:
+	go run client/client.go \
+		-port=$(LOCAL_PORT)
+
 docker-run:
 	docker run --network="host" $(IMAGE_NAME) \
 		/usr/local/bin/app \
@@ -53,3 +57,6 @@ test-minikube:
 push-gcr:
 	docker tag $(IMAGE_NAME) gcr.io/$(PROJECT_ID)/$(IMAGE_NAME):$(TAG)
 	docker push gcr.io/$(PROJECT_ID)/$(IMAGE_NAME)
+
+update-deps:
+	go get -u

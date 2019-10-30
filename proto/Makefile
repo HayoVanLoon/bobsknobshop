@@ -34,3 +34,4 @@ protoc-go: clean-protoc
 			-I. \
 			$$FILE; \
 	done
+	-update-genproto
