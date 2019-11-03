@@ -18,6 +18,7 @@
 package main
 
 import (
+	"encoding/csv"
 	"flag"
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1"
 	commonpb "github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
@@ -26,13 +27,13 @@ import (
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
+	"os"
 	"strconv"
 )
 
 const (
-	defaultPort = 9000
-	self        = "classy"
-	version     = "v1"
+	defaultPort     = 9000
+	defaultSubsFile = "subs.csv"
 )
 
 type server struct {
@@ -41,6 +42,45 @@ type server struct {
 
 func newServer(services map[string]string) *server {
 	return &server{services}
+}
+
+func readSubsFile(file string) map[string]string {
+	f, err := os.Open(file)
+	if err != nil {
+		log.Fatal("could not open config file")
+	}
+	r := csv.NewReader(f)
+
+	vs := map[string]string{}
+	for row, err := r.Read(); row != nil; row, err = r.Read() {
+		if err != nil {
+			log.Fatal("error reading config file")
+		}
+		if len(row) != 3 {
+			log.Fatalf("invalid row in config file %s", row)
+		}
+		vs[row[0]] = vs[row[1]] + ":" + row[2]
+	}
+
+	return vs
+}
+
+// Provides a connection-closing function
+func CloseConnFn(conn *grpc.ClientConn) func() {
+	return func() {
+		if err := conn.Close(); err != nil {
+			log.Printf("WARN: error closing connection: %v", err)
+		}
+	}
+}
+
+// Establishes a connection to a service
+func GetConn(s string) (*grpc.ClientConn, error) {
+	conn, err := grpc.Dial(s, grpc.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
+	return conn, nil
 }
 
 // Provides a sub-service  client
@@ -71,14 +111,9 @@ func (s server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (resp 
 }
 
 func main() {
+	var subsFile = flag.String("subs-file", defaultSubsFile, "csv file with version parameters")
 	var port = flag.Int("port", defaultPort, "port to listen on")
 	flag.Parse()
-
-	subs := map[string]string{
-		"a1basic":     self,
-		"a2extradata": self,
-		"a3nlp":       self,
-	}
 
 	lis, err := net.Listen("tcp", ":"+strconv.Itoa(*port))
 	if err != nil {
@@ -86,7 +121,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	pb.RegisterClassyServer(s, newServer(subs))
+	pb.RegisterClassyServer(s, newServer(readSubsFile(*subsFile)))
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)

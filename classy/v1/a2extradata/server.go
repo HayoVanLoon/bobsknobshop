@@ -27,14 +27,35 @@ import (
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
+	"strconv"
 	"unicode"
 )
 
 const (
-	defaultPort = "9000"
+	defaultPort = 9000
+	peddlerHost = "peddlerService-service"
 )
 
 type server struct {
+	peddlerService string
+}
+
+// Provides a connection-closing function
+func CloseConnFn(conn *grpc.ClientConn) func() {
+	return func() {
+		if err := conn.Close(); err != nil {
+			log.Printf("WARN: error closing connection: %v", err)
+		}
+	}
+}
+
+// Establishes a connection to a service
+func GetConn(s string) (*grpc.ClientConn, error) {
+	conn, err := grpc.Dial(s, grpc.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
+	return conn, nil
 }
 
 func getClient(s string) (peddler.PeddlerClient, func(), error) {
@@ -66,9 +87,10 @@ func (s *server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (*pb.
 		}
 	}
 
-	cl, closeFn, err := getClient("s")
+	cl, closeFn, err := getClient(s.peddlerService)
 	if err != nil {
 		// TODO: handle error
+		log.Printf("error creating client for %s", s.peddlerService)
 		return nil, err
 	}
 	defer closeFn()
@@ -90,16 +112,21 @@ func (s *server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (*pb.
 }
 
 func main() {
-	var port = flag.String("port", defaultPort, "port to listen on")
+	var port = flag.Int("port", defaultPort, "port to listen on")
+
+	var peddlerHost = flag.String("peddlerService-host", peddlerHost, "peddlerService service host")
+	var peddlerPort = flag.Int("peddlerService-port", defaultPort, "peddlerService service port")
+
 	flag.Parse()
 
-	lis, err := net.Listen("tcp", ":"+*port)
+	lis, err := net.Listen("tcp", ":"+strconv.Itoa(*port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
 	s := grpc.NewServer()
-	pb.RegisterClassyServer(s, &server{})
+	p := *peddlerHost + ":" + strconv.Itoa(*peddlerPort)
+	pb.RegisterClassyServer(s, &server{p})
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)

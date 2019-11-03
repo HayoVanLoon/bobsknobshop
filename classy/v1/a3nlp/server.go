@@ -28,10 +28,11 @@ import (
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
+	"strconv"
 )
 
 const (
-	defaultPort         = "9000"
+	defaultPort         = 9000
 	questionThreshold   = 0
 	complimentThreshold = .6
 )
@@ -74,10 +75,10 @@ func (s *server) ClassifyComment(ctx context.Context, r *common.Comment) (*pb.Cl
 }
 
 func main() {
-	var port = flag.String("port", defaultPort, "port to listen on")
+	var port = flag.Int("port", defaultPort, "port to listen on")
 	flag.Parse()
 
-	lis, err := net.Listen("tcp", ":"+*port)
+	lis, err := net.Listen("tcp", ":"+strconv.Itoa(*port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}

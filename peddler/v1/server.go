@@ -37,8 +37,6 @@ import (
 
 const (
 	defaultPort = 9000
-	self        = "peddler"
-	version     = "v1"
 )
 
 func createOrders() []common.Order {
