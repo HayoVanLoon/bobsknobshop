@@ -40,6 +40,14 @@ update-deps-classy:
 	@$(MAKE) -C classy update-deps
 
 
+# Comment Centre
+run-commentcentre:
+	$(MAKE) -C commentcentre run
+
+update-deps-classy:
+	@$(MAKE) -C commentcentre update-deps
+
+
 # Peddler
 run-peddler:
 	$(MAKE) -C peddler run

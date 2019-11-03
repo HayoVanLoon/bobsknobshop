@@ -3,7 +3,7 @@ module github.com/HayoVanLoon/bobsknobshop/peddler/v1
 go 1.13
 
 require (
-	github.com/HayoVanLoon/genproto v0.0.0-20191101080107-310ba595feef
+	github.com/HayoVanLoon/genproto v0.0.0-20191103145704-ba177574d03c
 	github.com/golang/protobuf v1.3.2
 	github.com/google/uuid v1.1.1
 	golang.org/x/net v0.0.0-20191101175033-0deb6923b6d9 // indirect

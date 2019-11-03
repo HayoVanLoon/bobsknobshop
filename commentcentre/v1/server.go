@@ -19,25 +19,24 @@ package main
 
 import (
 	"flag"
-	pb "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1"
-	commonpb "github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
-	"github.com/HayoVanLoon/genproto/bobsknobshop/peddler/v1"
+	classypb "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1"
+	pb "github.com/HayoVanLoon/genproto/bobsknobshop/commentcentre/v1"
+	"github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
 	"strconv"
-	"unicode"
 )
 
 const (
-	defaultPort        = 9000
-	defaultPeddlerHost = "peddlerService-service"
+	defaultPort       = 9000
+	defaultClassyHost = "classy-service"
 )
 
 type server struct {
-	peddlerService string
+	classyService string
 }
 
 // Provides a connection-closing function
@@ -58,65 +57,38 @@ func GetConn(s string) (*grpc.ClientConn, error) {
 	return conn, nil
 }
 
-func getClient(s string) (peddler.PeddlerClient, func(), error) {
-	conn, err := GetConn(s)
+// Provides a sub-service  client
+func getClassyClient(service string) (classypb.ClassyClient, func(), error) {
+	conn, err := GetConn(service)
 	if err != nil {
 		return nil, nil, err
 	}
-	closeConnFn := CloseConnFn(conn)
-	cl := peddler.NewPeddlerClient(conn)
-	return cl, closeConnFn, nil
+	return classypb.NewClassyClient(conn), CloseConnFn(conn), err
 }
 
-func (s server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (*pb.Classification, error) {
-	qc := 0
-	ec := 0
-	emo := 0
-	lst := '.'
-	for _, c := range r.Text {
-		if c == '?' {
-			qc += 1
-		} else if c == '!' {
-			ec += 1
-		} else if unicode.IsUpper(c) && !unicode.IsPunct(lst) {
-			emo += 1
-		}
-
-		if !unicode.IsSpace(c) {
-			lst = c
-		}
-	}
-
-	cl, closeFn, err := getClient(s.peddlerService)
+func (s server) CreateComment(ctx context.Context, r *common.Comment) (*common.Comment, error) {
+	cl, closeFn, err := getClassyClient(s.classyService)
 	if err != nil {
-		// TODO: handle error
-		log.Printf("error creating client for %s", s.peddlerService)
+		log.Print("error creating classy client")
 		return nil, err
 	}
 	defer closeFn()
 
-	log.Print(cl)
-
-	resp := &pb.Classification{}
-	if ec > 0 && emo < 2 {
-		resp.Category = "compliment"
-	} else if emo > 2 {
-		resp.Category = "complaint"
-	} else if qc > 0 {
-		resp.Category = "question"
-	} else {
-		resp.Category = "comment"
+	resp, err := cl.ClassifyComment(ctx, r)
+	if err != nil {
+		log.Print("error calling classy service")
+		return nil, err
 	}
+	log.Printf("%s", resp)
 
-	return resp, nil
+	return r, nil
 }
 
 func main() {
 	var port = flag.Int("port", defaultPort, "port to listen on")
 
-	var peddlerHost = flag.String("peddlerService-host", defaultPeddlerHost, "peddler service host")
-	var peddlerPort = flag.Int("peddlerService-port", defaultPort, "peddler service port")
-
+	var classyHost = flag.String("peddlerService-host", defaultClassyHost, "classy service host")
+	var classyPort = flag.Int("peddlerService-port", defaultPort, "classy service port")
 	flag.Parse()
 
 	lis, err := net.Listen("tcp", ":"+strconv.Itoa(*port))
@@ -125,8 +97,8 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	peddlerService := *peddlerHost + ":" + strconv.Itoa(*peddlerPort)
-	pb.RegisterClassyServer(s, server{peddlerService})
+	classyService := *classyHost + ":" + strconv.Itoa(*classyPort)
+	pb.RegisterCommentcentreServer(s, server{classyService})
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)

@@ -4,6 +4,8 @@ github.com/HayoVanLoon/genproto v0.0.0-20191029115803-96a8497853ff h1:SvQGvw9OV0
 github.com/HayoVanLoon/genproto v0.0.0-20191029115803-96a8497853ff/go.mod h1:HLABCVtqGSsmACp1a8Bd9y3W3G9UUx668TEks1kc7AE=
 github.com/HayoVanLoon/genproto v0.0.0-20191101080107-310ba595feef h1:GrxC8NnmEfEaKvf4mLLV7p9Yx+G+VrOtT/8OWNXEoBc=
 github.com/HayoVanLoon/genproto v0.0.0-20191101080107-310ba595feef/go.mod h1:HLABCVtqGSsmACp1a8Bd9y3W3G9UUx668TEks1kc7AE=
+github.com/HayoVanLoon/genproto v0.0.0-20191103145704-ba177574d03c h1:k3c2pn1BflxquznP9NHGXVXO3malRbqYZz35BcLBHTk=
+github.com/HayoVanLoon/genproto v0.0.0-20191103145704-ba177574d03c/go.mod h1:HLABCVtqGSsmACp1a8Bd9y3W3G9UUx668TEks1kc7AE=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b/go.mod h1:SBH7ygxi8pfUlaOkMMuAQtPIUF8ecWP5IEl/CR7VP2Q=
 github.com/golang/mock v1.1.1/go.mod h1:oTYuIxOrZwtPieC+H1uAHpcLFnEyAGVDL/k47Jfbm0A=

@@ -40,10 +40,6 @@ type server struct {
 	services map[string]string
 }
 
-func newServer(services map[string]string) *server {
-	return &server{services}
-}
-
 func readSubsFile(file string) map[string]string {
 	f, err := os.Open(file)
 	if err != nil {
@@ -121,7 +117,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	pb.RegisterClassyServer(s, newServer(readSubsFile(*subsFile)))
+	pb.RegisterClassyServer(s, server{readSubsFile(*subsFile)})
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
