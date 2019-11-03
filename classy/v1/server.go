@@ -19,7 +19,6 @@ package main
 
 import (
 	"flag"
-	"github.com/HayoVanLoon/bobsknobshop/common"
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1"
 	commonpb "github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
 	"golang.org/x/net/context"
@@ -36,8 +35,6 @@ const (
 	version     = "v1"
 )
 
-var implementations = map[string]common.ServiceImplementation{}
-
 type server struct {
 	services map[string]string
 }
@@ -48,33 +45,14 @@ func newServer(services map[string]string) *server {
 
 // Provides a sub-service  client
 func (s server) getSubServiceClient(sub string) (pb.ClassyClient, func(), error) {
-	conn, err := s.getConn(implementations[sub].Service())
+	conn, err := GetConn(s.services[sub])
 	if err != nil {
 		return nil, nil, err
 	}
-	return pb.NewClassyClient(conn), closeConnFn(conn), err
-}
-
-// Provides a connection-closing function
-func closeConnFn(conn *grpc.ClientConn) func() {
-	return func() {
-		if err := conn.Close(); err != nil {
-			log.Printf("WARN: error closing connection: %v", err)
-		}
-	}
-}
-
-// Establishes a connection to a service
-func (s server) getConn(service string) (*grpc.ClientConn, error) {
-	conn, err := grpc.Dial(s.services[service], grpc.WithInsecure())
-	if err != nil {
-		return nil, err
-	}
-	return conn, nil
+	return pb.NewClassyClient(conn), CloseConnFn(conn), err
 }
 
 func (s server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (resp *pb.Classification, err error) {
-
 	cl, cls, err := s.getSubServiceClient("a3nlp")
 	if err != nil {
 		return nil, err
@@ -96,8 +74,10 @@ func main() {
 	var port = flag.Int("port", defaultPort, "port to listen on")
 	flag.Parse()
 
-	for i, n := range []string{"a1basic", "a2extradata", "a3nlp"} {
-		implementations[n] = common.NewServiceImplementation(self, version, n, *port+1+i, true)
+	subs := map[string]string{
+		"a1basic":     self,
+		"a2extradata": self,
+		"a3nlp":       self,
 	}
 
 	lis, err := net.Listen("tcp", ":"+strconv.Itoa(*port))
@@ -106,7 +86,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	pb.RegisterClassyServer(s, newServer(map[string]string{}))
+	pb.RegisterClassyServer(s, newServer(subs))
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)

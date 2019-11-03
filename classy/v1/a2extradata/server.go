@@ -20,7 +20,8 @@ package main
 import (
 	"flag"
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1"
-	"github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
+	commonpb "github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
+	"github.com/HayoVanLoon/genproto/bobsknobshop/peddler/v1"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -36,7 +37,17 @@ const (
 type server struct {
 }
 
-func (s *server) ClassifyComment(ctx context.Context, r *common.Comment) (*pb.Classification, error) {
+func getClient(s string) (peddler.PeddlerClient, func(), error) {
+	conn, err := GetConn(s)
+	if err != nil {
+		return nil, nil, err
+	}
+	closeConnFn := CloseConnFn(conn)
+	cl := peddler.NewPeddlerClient(conn)
+	return cl, closeConnFn, nil
+}
+
+func (s *server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (*pb.Classification, error) {
 	qc := 0
 	ec := 0
 	emo := 0
@@ -54,6 +65,15 @@ func (s *server) ClassifyComment(ctx context.Context, r *common.Comment) (*pb.Cl
 			lst = c
 		}
 	}
+
+	cl, closeFn, err := getClient("s")
+	if err != nil {
+		// TODO: handle error
+		return nil, err
+	}
+	defer closeFn()
+
+	log.Print(cl)
 
 	resp := &pb.Classification{}
 	if ec > 0 && emo < 2 {

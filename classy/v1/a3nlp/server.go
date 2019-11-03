@@ -24,7 +24,6 @@ import (
 	"github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
 	"golang.org/x/net/context"
 	languagepb "google.golang.org/genproto/googleapis/cloud/language/v1"
-	"google.golang.org/genproto/googleapis/cloud/support/common"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"log"

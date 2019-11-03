@@ -28,7 +28,7 @@ option java_package = "gl.bobsknobshop.peddler.v1";
 option go_package = "github.com/HayoVanLoon/genproto/bobsknobshop/peddler/v1;peddler";
 
 
-// A service for classifying things.
+// A service for order information.
 service Peddler {
 
     // Returns a classification for a comment

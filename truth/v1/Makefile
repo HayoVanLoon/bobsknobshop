@@ -59,4 +59,4 @@ push-gcr:
 	docker push gcr.io/$(PROJECT_ID)/$(IMAGE_NAME)
 
 update-deps:
-	go get -u
+	go get -u ./...

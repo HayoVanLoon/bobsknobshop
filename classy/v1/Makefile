@@ -40,6 +40,9 @@ run:
 	go run server.go \
 		-port=$(LOCAL_PORT)
 
+update-deps:
+	go get -u ./...
+
 docker-run:
 	docker run --network="host" $(IMAGE_NAME) \
 		/usr/local/bin/app \

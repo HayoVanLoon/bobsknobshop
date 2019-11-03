@@ -27,6 +27,8 @@ protoc:
 	# add specific recipes here as needed / convenient
 	$(MAKE) -C proto protoc-go
 
+update-deps: update-deps-classy update-deps-peddler update-deps-truth
+
 
 # Module-Specific Recipes
 
@@ -34,10 +36,16 @@ protoc:
 run-classy:
 	$(MAKE) -C classy run
 
+update-deps-classy:
+	@$(MAKE) -C classy update-deps
+
 
 # Peddler
 run-peddler:
 	$(MAKE) -C peddler run
+
+update-deps-peddler:
+	@$(MAKE) -C peddler update-deps
 
 smoke-test-peddler:
 	@$(MAKE) -C peddler smoke-test
