@@ -26,8 +26,10 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"log"
+	"math/rand"
 	"net"
 	"os"
+	"sort"
 	"strconv"
 )
 
@@ -36,28 +38,48 @@ const (
 	defaultSubsFile = "subs.csv"
 )
 
-type server struct {
-	services map[string]string
+type versionConfig struct {
+	name, target string
+	traffic      int
 }
 
-func readSubsFile(file string) map[string]string {
+type server struct {
+	services []versionConfig
+}
+
+func readSubsFile(file string) []versionConfig {
 	f, err := os.Open(file)
 	if err != nil {
-		log.Fatal("could not open config file")
+		log.Fatal("could not open subs config file")
 	}
 	r := csv.NewReader(f)
 
-	vs := map[string]string{}
+	var vs []versionConfig
 	for row, err := r.Read(); row != nil; row, err = r.Read() {
 		if err != nil {
-			log.Fatal("error reading config file")
+			log.Fatal("error reading subs config file")
 		}
-		if len(row) != 3 {
-			log.Fatalf("invalid row in config file %s", row)
+		if len(row) != 4 {
+			log.Fatalf("invalid row in subs config file %s", row)
 		}
-		vs[row[0]] = vs[row[1]] + ":" + row[2]
+		var ta string
+		if row[2] != "" {
+			ta = row[1] + ":" + row[2]
+		} else {
+			ta = row[1]
+		}
+		tr, err := strconv.Atoi(row[3])
+		if err != nil {
+			log.Fatalf("invalid traffic value in row: %s", row)
+		}
+		vs = append(vs, versionConfig{row[0], ta, tr})
 	}
 
+	if len(vs) == 0 {
+		log.Fatal("empty subs config file")
+	}
+
+	sort.Slice(vs, func(i, j int) bool { return vs[i].traffic > vs[j].traffic })
 	return vs
 }
 
@@ -71,17 +93,35 @@ func CloseConnFn(conn *grpc.ClientConn) func() {
 }
 
 // Establishes a connection to a service
-func GetConn(s string) (*grpc.ClientConn, error) {
-	conn, err := grpc.Dial(s, grpc.WithInsecure())
+func GetConn(t string) (*grpc.ClientConn, error) {
+	conn, err := grpc.Dial(t, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
 	return conn, nil
 }
 
+// Randomly selects version based on traffic weights
+func (s server) selectVersion() versionConfig {
+	acc := 0
+	for _, v := range s.services {
+		acc += v.traffic
+	}
+	r := rand.Intn(acc)
+	acc = 0
+	for _, v := range s.services {
+		if v.traffic+acc >= r {
+			return v
+		}
+		acc += v.traffic
+	}
+	panic("unreachable code reached")
+}
+
 // Provides a sub-service  client
-func (s server) getSubServiceClient(sub string) (pb.ClassyClient, func(), error) {
-	conn, err := GetConn(s.services[sub])
+func (s server) getSubServiceClient() (pb.ClassyClient, func(), error) {
+	v := s.selectVersion()
+	conn, err := GetConn(v.target)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -89,7 +129,7 @@ func (s server) getSubServiceClient(sub string) (pb.ClassyClient, func(), error)
 }
 
 func (s server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (resp *pb.Classification, err error) {
-	cl, cls, err := s.getSubServiceClient("a3nlp")
+	cl, cls, err := s.getSubServiceClient()
 	if err != nil {
 		return nil, err
 	}

@@ -69,11 +69,23 @@ func getClient(s string) (peddler.PeddlerClient, func(), error) {
 }
 
 func (s server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (*pb.Classification, error) {
-	qc := 0
-	ec := 0
-	emo := 0
+	qc, ec, emo := analyseText(r.Text)
+
+	ords, err := s.getOrders(ctx, r.Author)
+	if err != nil {
+		log.Printf("error fetching orders, assuming none exist (%s)", err.Error())
+		ords = []*commonpb.Order{}
+	}
+
+	cat := calcOutcome(ec, emo, qc, ords)
+
+	resp := &pb.Classification{Category: cat}
+	return resp, nil
+}
+
+func analyseText(s string) (qc, ec, emo int) {
 	lst := '.'
-	for _, c := range r.Text {
+	for _, c := range s {
 		if c == '?' {
 			qc += 1
 		} else if c == '!' {
@@ -86,29 +98,36 @@ func (s server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (*pb.C
 			lst = c
 		}
 	}
+	return
+}
 
+func (s server) getOrders(ctx context.Context, cust string) ([]*commonpb.Order, error) {
 	cl, closeFn, err := getClient(s.peddlerService)
 	if err != nil {
-		// TODO: handle error
 		log.Printf("error creating client for %s", s.peddlerService)
 		return nil, err
 	}
 	defer closeFn()
 
-	log.Print(cl)
-
-	resp := &pb.Classification{}
-	if ec > 0 && emo < 2 {
-		resp.Category = "compliment"
-	} else if emo > 2 {
-		resp.Category = "complaint"
-	} else if qc > 0 {
-		resp.Category = "question"
-	} else {
-		resp.Category = "comment"
+	resp, err := cl.SearchOrders(ctx, &peddler.SearchOrdersRequest{Customer: []string{cust}})
+	if err != nil {
+		log.Print("error fetching orders")
+		return nil, err
 	}
 
-	return resp, nil
+	return resp.Orders, nil
+}
+
+func calcOutcome(ec, emo, qc int, ords []*commonpb.Order) string {
+	if ec > 0 && emo < 2 {
+		return "compliment"
+	} else if emo > 2 {
+		return "complaint"
+	} else if qc > 0 {
+		return "question"
+	} else {
+		return "comment"
+	}
 }
 
 func main() {

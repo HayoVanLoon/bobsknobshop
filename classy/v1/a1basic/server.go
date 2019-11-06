@@ -38,11 +38,17 @@ type server struct {
 }
 
 func (s *server) ClassifyComment(ctx context.Context, r *common.Comment) (*pb.Classification, error) {
-	qc := 0
-	ec := 0
-	emo := 0
+	qc, ec, emo := analyseText(r.Text)
+
+	cat := calcOutcome(ec, emo, qc)
+
+	resp := &pb.Classification{Category: cat}
+	return resp, nil
+}
+
+func analyseText(s string) (qc, ec, emo int) {
 	lst := '.'
-	for _, c := range r.Text {
+	for _, c := range s {
 		if c == '?' {
 			qc += 1
 		} else if c == '!' {
@@ -55,19 +61,19 @@ func (s *server) ClassifyComment(ctx context.Context, r *common.Comment) (*pb.Cl
 			lst = c
 		}
 	}
+	return
+}
 
-	resp := &pb.Classification{}
+func calcOutcome(ec, emo, qc int) string {
 	if ec > 0 && emo < 2 {
-		resp.Category = "compliment"
+		return "compliment"
 	} else if emo > 2 {
-		resp.Category = "complaint"
+		return "complaint"
 	} else if qc > 0 {
-		resp.Category = "question"
+		return "question"
 	} else {
-		resp.Category = "comment"
+		return "comment"
 	}
-
-	return resp, nil
 }
 
 func main() {
