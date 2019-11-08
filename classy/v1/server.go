@@ -22,6 +22,7 @@ import (
 	"flag"
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1"
 	commonpb "github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
+	"github.com/google/uuid"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -31,6 +32,7 @@ import (
 	"os"
 	"sort"
 	"strconv"
+	"time"
 )
 
 const (
@@ -119,8 +121,7 @@ func (s server) selectVersion() versionConfig {
 }
 
 // Provides a sub-service  client
-func (s server) getSubServiceClient() (pb.ClassyClient, func(), error) {
-	v := s.selectVersion()
+func (s server) getSubServiceClient(v versionConfig) (pb.ClassyClient, func(), error) {
 	conn, err := GetConn(v.target)
 	if err != nil {
 		return nil, nil, err
@@ -129,7 +130,8 @@ func (s server) getSubServiceClient() (pb.ClassyClient, func(), error) {
 }
 
 func (s server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (resp *pb.Classification, err error) {
-	cl, cls, err := s.getSubServiceClient()
+	v := s.selectVersion()
+	cl, cls, err := s.getSubServiceClient(v)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +142,14 @@ func (s server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (resp 
 		return nil, err
 	}
 
+	resp.Name = "classy.bobsknobshop.gl/classifications/" + uuid.New().String()
+	resp.CreatedOn = time.Now().Unix()
+	resp.ServiceVersion = v.name
+	resp.Comment = r.GetName()
+
 	// TODO: store response
+	log.Printf("%s: Comment '%s' is deemed a '%s'", resp.GetServiceVersion(), r.GetText(), resp.GetCategory())
+
 	// TODO: store metadata
 
 	return resp, nil

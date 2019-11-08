@@ -38,7 +38,9 @@ build:
 
 run:
 	go run server.go \
-		-port=$(LOCAL_PORT)
+		-port=$(LOCAL_PORT) \
+		-classy-host=localhost \
+		-classy-port=9000
 
 smoke-test:
 	go run client/client.go \

@@ -20,7 +20,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/commentcentre/v1"
 	"github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
 	"google.golang.org/grpc"
@@ -34,41 +33,21 @@ const (
 	defaultPort = 9010
 )
 
-func getConn(host string, port int) (*grpc.ClientConn, error) {
-	conn, err := grpc.Dial(host+":"+strconv.Itoa(port), grpc.WithInsecure())
-	if err != nil {
-		return nil, fmt.Errorf("did not connect: %v", err)
-	}
-	return conn, nil
-}
-
-func createMessage(host string, port int, s string) error {
-	r := &common.Comment{
-		Author: s,
-		Topic:  "123-456-789-0-1",
-		Text:   "I do not like this",
-	}
-
-	conn, err := getConn(host, port)
-	defer func() {
-		if err := conn.Close(); err != nil {
-			log.Panicf("error closing connection: %v", err)
-		}
-	}()
+func createComment(host string, port int, c *common.Comment) {
+	conn, _ := grpc.Dial(host+":"+strconv.Itoa(port), grpc.WithInsecure())
+	defer func() { _ = conn.Close() }()
 
 	cl := pb.NewCommentcentreClient(conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	resp, err := cl.CreateComment(ctx, r)
-
-	log.Printf("%v\n", resp)
+	resp, err := cl.CreateComment(ctx, c)
 	if err != nil {
-		log.Printf("%v\n", err)
+		log.Fatal(err.Error())
 	}
 
-	return err
+	log.Printf("%s\n", resp)
 }
 
 // Meant for debugging purposes.
@@ -77,6 +56,15 @@ func main() {
 	var port = flag.Int("port", defaultPort, "service port")
 	flag.Parse()
 
-	_ = createMessage(*host, *port, "Alice")
-	_ = createMessage(*host, *port, "Cathy")
+	question := &common.Comment{
+		Text:   "I have a question about this product. How do I use it?",
+		Author: "Cathy",
+	}
+	complaint := &common.Comment{
+		Text:   "The knob is too jolly. This does not please me.",
+		Author: "Alice",
+	}
+
+	createComment(*host, *port, question)
+	createComment(*host, *port, complaint)
 }

@@ -22,12 +22,14 @@ import (
 	classypb "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1"
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/commentcentre/v1"
 	"github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
+	"github.com/google/uuid"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
 	"strconv"
+	"time"
 )
 
 const (
@@ -74,6 +76,11 @@ func (s server) CreateComment(ctx context.Context, r *common.Comment) (*common.C
 	}
 	defer closeFn()
 
+	r.Name = "commentcentre.bobsknobshop.gl/comments/" + uuid.New().String()
+	r.CreatedOn = time.Now().Unix()
+
+	// TODO: store comment
+
 	resp, err := cl.ClassifyComment(ctx, r)
 	if err != nil {
 		log.Print("error calling classy service")
@@ -87,8 +94,8 @@ func (s server) CreateComment(ctx context.Context, r *common.Comment) (*common.C
 func main() {
 	var port = flag.Int("port", defaultPort, "port to listen on")
 
-	var classyHost = flag.String("peddlerService-host", defaultClassyHost, "classy service host")
-	var classyPort = flag.Int("peddlerService-port", defaultPort, "classy service port")
+	var classyHost = flag.String("classy-host", defaultClassyHost, "classy service host")
+	var classyPort = flag.Int("classy-port", defaultPort, "classy service port")
 	flag.Parse()
 
 	lis, err := net.Listen("tcp", ":"+strconv.Itoa(*port))

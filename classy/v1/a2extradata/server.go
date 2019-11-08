@@ -28,6 +28,7 @@ import (
 	"log"
 	"net"
 	"strconv"
+	"strings"
 	"unicode"
 )
 
@@ -77,7 +78,7 @@ func (s server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (*pb.C
 		ords = []*commonpb.Order{}
 	}
 
-	cat := calcOutcome(ec, emo, qc, ords)
+	cat := calcOutcome(ec, emo, qc, strings.ToUpper(r.GetTopic()), ords)
 
 	resp := &pb.Classification{Category: cat}
 	return resp, nil
@@ -118,12 +119,22 @@ func (s server) getOrders(ctx context.Context, cust string) ([]*commonpb.Order, 
 	return resp.Orders, nil
 }
 
-func calcOutcome(ec, emo, qc int, ords []*commonpb.Order) string {
+func calcOutcome(ec, emo, qc int, sku string, ords []*commonpb.Order) string {
+	ordered := false
+	for _, o := range ords {
+		for _, ol := range o.GetOrderLines() {
+			ordered = ordered || strings.ToUpper(ol.GetSku()) == sku
+		}
+		if ordered {
+			break
+		}
+	}
+
 	if ec > 0 && emo < 2 {
 		return "compliment"
 	} else if emo > 2 {
 		return "complaint"
-	} else if qc > 0 {
+	} else if qc > 0 && !ordered {
 		return "question"
 	} else {
 		return "comment"
@@ -133,8 +144,8 @@ func calcOutcome(ec, emo, qc int, ords []*commonpb.Order) string {
 func main() {
 	var port = flag.Int("port", defaultPort, "port to listen on")
 
-	var peddlerHost = flag.String("peddlerService-host", defaultPeddlerHost, "peddler service host")
-	var peddlerPort = flag.Int("peddlerService-port", defaultPort, "peddler service port")
+	var peddlerHost = flag.String("peddler-host", defaultPeddlerHost, "peddler service host")
+	var peddlerPort = flag.Int("peddler-port", defaultPort, "peddler service port")
 
 	flag.Parse()
 

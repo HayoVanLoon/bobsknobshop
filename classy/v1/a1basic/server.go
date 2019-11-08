@@ -38,7 +38,7 @@ type server struct {
 }
 
 func (s *server) ClassifyComment(ctx context.Context, r *common.Comment) (*pb.Classification, error) {
-	qc, ec, emo := analyseText(r.Text)
+	qc, ec, emo := analyseText(r.GetText())
 
 	cat := calcOutcome(ec, emo, qc)
 

@@ -40,6 +40,10 @@ run:
 	go run server.go \
 		-port=$(LOCAL_PORT)
 
+smoke-test:
+	go run client/client.go \
+		-port=$(LOCAL_PORT)
+
 update-deps:
 	go get -u ./...
 

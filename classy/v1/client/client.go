@@ -20,7 +20,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1"
 	commonpb "github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
 	"google.golang.org/grpc"
@@ -34,21 +33,9 @@ const (
 	defaultPort = 9000
 )
 
-func getConn(host string, port int) (*grpc.ClientConn, error) {
-	conn, err := grpc.Dial(host+":"+strconv.Itoa(port), grpc.WithInsecure())
-	if err != nil {
-		return nil, fmt.Errorf("did not connect: %v", err)
-	}
-	return conn, nil
-}
-
-func createMessage(host string, port int, c *commonpb.Comment) error {
-	conn, err := getConn(host, port)
-	defer func() {
-		if err := conn.Close(); err != nil {
-			log.Panicf("error closing connection: %v", err)
-		}
-	}()
+func classifyComment(host string, port int, c *commonpb.Comment) error {
+	conn, _ := grpc.Dial(host+":"+strconv.Itoa(port), grpc.WithInsecure())
+	defer func() { _ = conn.Close() }()
 
 	cl := pb.NewClassyClient(conn)
 
@@ -56,11 +43,7 @@ func createMessage(host string, port int, c *commonpb.Comment) error {
 	defer cancel()
 
 	resp, err := cl.ClassifyComment(ctx, c)
-
-	log.Printf("%v\n", resp)
-	if err != nil {
-		log.Printf("%v\n", err)
-	}
+	log.Printf("%s\n", resp)
 
 	return err
 }
@@ -84,6 +67,6 @@ func main() {
 		CreatedOn: time.Now().UnixNano()/1000000 + 1,
 	}
 
-	_ = createMessage(*host, *port, question)
-	_ = createMessage(*host, *port, complaint)
+	_ = classifyComment(*host, *port, question)
+	_ = classifyComment(*host, *port, complaint)
 }

@@ -39,6 +39,9 @@ run-classy:
 update-deps-classy:
 	@$(MAKE) -C classy update-deps
 
+smoke-test-classy:
+	@$(MAKE) -C classy smoke-test
+
 
 # Comment Centre
 run-commentcentre:
@@ -47,6 +50,8 @@ run-commentcentre:
 update-deps-classy:
 	@$(MAKE) -C commentcentre update-deps
 
+smoke-test-commentcentre:
+	@$(MAKE) -C commentcentre smoke-test
 
 # Peddler
 run-peddler:
