@@ -34,4 +34,15 @@ service Commentcentre {
     // Returns a classification for a comment
     rpc CreateComment(common.v1.Comment) returns (common.v1.Comment) {
     }
+
+    // Returns all comments
+    // TODO: debug, remove before go-live
+    rpc ListComments(ListCommentsRequest) returns (ListCommentsResponse) {
+    }
+}
+
+message ListCommentsRequest {}
+
+message ListCommentsResponse {
+    repeated common.v1.Comment comments = 1;
 }

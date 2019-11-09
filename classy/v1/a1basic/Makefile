@@ -31,6 +31,9 @@ protoc:
 test:
 	@echo TODO
 
+update-deps:
+	go get -u ./...
+
 build:
 	docker build -t $(IMAGE_NAME) .
 

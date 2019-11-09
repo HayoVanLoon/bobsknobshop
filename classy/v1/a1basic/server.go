@@ -19,6 +19,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1"
 	"github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
 	"github.com/HayoVanLoon/go-commons/i18n"
@@ -39,10 +40,10 @@ type server struct {
 	peddlerService string
 }
 
-func (s *server) ClassifyComment(ctx context.Context, r *common.Comment) (*pb.Classification, error) {
+func (s server) ClassifyComment(ctx context.Context, r *common.Comment) (*pb.Classification, error) {
 	q, ex, emo := analyseText(r.GetText())
 
-	cat := predict(ex, q, emo, len(r.GetText()))
+	cat := predict(q, ex, emo, len(r.GetText()))
 
 	resp := &pb.Classification{Category: cat}
 	return resp, nil
@@ -54,7 +55,7 @@ func analyseText(s string) (q, ex int, emo float32) {
 	for _, c := range s {
 		if i18n.IsQuestionMark(c) {
 			q += 1
-		} else if c == '!' {
+		} else if i18n.IsExclamationMark(c) {
 			ex += 1
 		} else if unicode.IsUpper(c) && !unicode.IsPunct(lst) {
 			emo += 1
@@ -73,7 +74,7 @@ func predict(questionMarks, exclamationMarks int, emo float32, l int) string {
 	log.Printf("%v; %v; %v; %v", questionMarks, exclamationMarks, emo, l)
 
 	if exclamationMarks > 0 {
-		if emo > 0 {
+		if emo > 0.1 {
 			return "complaint"
 		} else {
 			return "compliment"
@@ -91,6 +92,10 @@ func predict(questionMarks, exclamationMarks int, emo float32, l int) string {
 	}
 }
 
+func (s server) ListClassifications(context.Context, *pb.ListClassificationsRequest) (*pb.ListClassificationsResponse, error) {
+	return nil, fmt.Errorf("not implemented (by design)")
+}
+
 func main() {
 	var port = flag.Int("port", defaultPort, "port to listen on")
 	flag.Parse()
@@ -101,7 +106,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	pb.RegisterClassyServer(s, &server{})
+	pb.RegisterClassyServer(s, server{})
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)

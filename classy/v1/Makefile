@@ -46,6 +46,10 @@ smoke-test:
 
 update-deps:
 	go get -u ./...
+	@$(MAKE) -C a0random update-deps
+	@$(MAKE) -C a1basic update-deps
+	@$(MAKE) -C a2extradata update-deps
+	@$(MAKE) -C a3nlp update-deps
 
 docker-run:
 	docker run --network="host" $(IMAGE_NAME) \

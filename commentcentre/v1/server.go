@@ -39,6 +39,7 @@ const (
 
 type server struct {
 	classyService string
+	comments      []*common.Comment
 }
 
 // Provides a connection-closing function
@@ -68,7 +69,7 @@ func getClassyClient(service string) (classypb.ClassyClient, func(), error) {
 	return classypb.NewClassyClient(conn), CloseConnFn(conn), err
 }
 
-func (s server) CreateComment(ctx context.Context, r *common.Comment) (*common.Comment, error) {
+func (s *server) CreateComment(ctx context.Context, r *common.Comment) (*common.Comment, error) {
 	cl, closeFn, err := getClassyClient(s.classyService)
 	if err != nil {
 		log.Print("error creating classy client")
@@ -80,6 +81,7 @@ func (s server) CreateComment(ctx context.Context, r *common.Comment) (*common.C
 	r.CreatedOn = time.Now().Unix()
 
 	// TODO: store comment
+	s.comments = append(s.comments, r)
 
 	resp, err := cl.ClassifyComment(ctx, r)
 	if err != nil {
@@ -89,6 +91,11 @@ func (s server) CreateComment(ctx context.Context, r *common.Comment) (*common.C
 	log.Printf("%s", resp)
 
 	return r, nil
+}
+
+func (s *server) ListComments(ctx context.Context, r *pb.ListCommentsRequest) (*pb.ListCommentsResponse, error) {
+	resp := &pb.ListCommentsResponse{Comments: s.comments}
+	return resp, nil
 }
 
 func main() {
@@ -105,7 +112,7 @@ func main() {
 
 	s := grpc.NewServer()
 	classyService := *classyHost + ":" + strconv.Itoa(*classyPort)
-	pb.RegisterCommentcentreServer(s, server{classyService})
+	pb.RegisterCommentcentreServer(s, &server{classyService, []*common.Comment{}})
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)

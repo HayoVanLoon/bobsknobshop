@@ -19,6 +19,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1"
 	commonpb "github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
 	"github.com/HayoVanLoon/genproto/bobsknobshop/peddler/v1"
@@ -88,7 +89,7 @@ func analyseText(s string) (q, ex int, emo float32) {
 	for _, c := range s {
 		if i18n.IsQuestionMark(c) {
 			q += 1
-		} else if c == '!' {
+		} else if i18n.IsExclamationMark(c) {
 			ex += 1
 		} else if unicode.IsUpper(c) && !unicode.IsPunct(lst) {
 			emo += 1
@@ -134,7 +135,7 @@ func predict(questionMarks, exclamationMarks int, emo float32, ordered bool) str
 	log.Printf("%v; %v; %v; %v", questionMarks, exclamationMarks, emo, ordered)
 
 	if exclamationMarks > 0 {
-		if emo > 0 {
+		if emo > 0.1 {
 			return "complaint"
 		} else {
 			return "compliment"
@@ -150,6 +151,10 @@ func predict(questionMarks, exclamationMarks int, emo float32, ordered bool) str
 			}
 		}
 	}
+}
+
+func (s server) ListClassifications(context.Context, *pb.ListClassificationsRequest) (*pb.ListClassificationsResponse, error) {
+	return nil, fmt.Errorf("not implemented (by design)")
 }
 
 func main() {

@@ -20,6 +20,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1"
 	commonpb "github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
 	"google.golang.org/grpc"
@@ -33,7 +34,7 @@ const (
 	defaultPort = 9000
 )
 
-func classifyComment(host string, port int, c *commonpb.Comment) error {
+func classifyComment(host string, port int, c *commonpb.Comment) {
 	conn, _ := grpc.Dial(host+":"+strconv.Itoa(port), grpc.WithInsecure())
 	defer func() { _ = conn.Close() }()
 
@@ -43,9 +44,28 @@ func classifyComment(host string, port int, c *commonpb.Comment) error {
 	defer cancel()
 
 	resp, err := cl.ClassifyComment(ctx, c)
+	if err != nil {
+		panic(err)
+	}
 	log.Printf("%s\n", resp)
+}
 
-	return err
+func listClassifications(host string, port int) {
+	conn, _ := grpc.Dial(host+":"+strconv.Itoa(port), grpc.WithInsecure())
+	defer func() { _ = conn.Close() }()
+
+	cl := pb.NewClassyClient(conn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	resp, err := cl.ListClassifications(ctx, &pb.ListClassificationsRequest{})
+	if err != nil {
+		panic(err)
+	}
+	for _, c := range resp.Classifications {
+		fmt.Println(c)
+	}
 }
 
 // Meant for debugging purposes.
@@ -67,6 +87,7 @@ func main() {
 		CreatedOn: time.Now().UnixNano()/1000000 + 1,
 	}
 
-	_ = classifyComment(*host, *port, question)
-	_ = classifyComment(*host, *port, complaint)
+	classifyComment(*host, *port, question)
+	classifyComment(*host, *port, complaint)
+	listClassifications(*host, *port)
 }

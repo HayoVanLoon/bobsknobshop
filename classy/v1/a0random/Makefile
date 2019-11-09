@@ -34,6 +34,9 @@ test:
 build:
 	docker build -t $(IMAGE_NAME) .
 
+update-deps:
+	go get -u ./...
+
 run:
 	go run server.go \
 		-port=$(LOCAL_PORT)

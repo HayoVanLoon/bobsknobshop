@@ -19,6 +19,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1"
 	"github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
 	"golang.org/x/net/context"
@@ -48,6 +49,10 @@ func (s *server) ClassifyComment(ctx context.Context, r *common.Comment) (*pb.Cl
 func predict() string {
 	opts := [5]string{"complaint", "compliment", "question", "review", "undetermined"}
 	return opts[rand.Intn(len(opts))]
+}
+
+func (s *server) ListClassifications(context.Context, *pb.ListClassificationsRequest) (*pb.ListClassificationsResponse, error) {
+	return nil, fmt.Errorf("not implemented (by design)")
 }
 
 func main() {

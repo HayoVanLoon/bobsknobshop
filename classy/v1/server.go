@@ -45,10 +45,6 @@ type versionConfig struct {
 	traffic      int
 }
 
-type server struct {
-	services []versionConfig
-}
-
 func readSubsFile(file string) []versionConfig {
 	f, err := os.Open(file)
 	if err != nil {
@@ -103,6 +99,38 @@ func GetConn(t string) (*grpc.ClientConn, error) {
 	return conn, nil
 }
 
+type server struct {
+	services        []versionConfig
+	classifications []*pb.Classification
+}
+
+func (s *server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (resp *pb.Classification, err error) {
+	v := s.selectVersion()
+	cl, cls, err := s.getSubServiceClient(v)
+	if err != nil {
+		return nil, err
+	}
+	defer cls()
+
+	resp, err = cl.ClassifyComment(ctx, r)
+	if err != nil {
+		return nil, err
+	}
+
+	resp.Name = "classy.bobsknobshop.gl/classifications/" + uuid.New().String()
+	resp.CreatedOn = time.Now().Unix()
+	resp.ServiceVersion = v.name
+	resp.Comment = r.GetName()
+
+	// TODO: store response
+	log.Printf("%s: %s: '%s'", resp.GetServiceVersion(), r.GetText(), resp.GetCategory())
+	s.classifications = append(s.classifications, resp)
+
+	// TODO: store metadata
+
+	return resp, nil
+}
+
 // Randomly selects version based on traffic weights
 func (s server) selectVersion() versionConfig {
 	acc := 0
@@ -129,29 +157,8 @@ func (s server) getSubServiceClient(v versionConfig) (pb.ClassyClient, func(), e
 	return pb.NewClassyClient(conn), CloseConnFn(conn), err
 }
 
-func (s server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (resp *pb.Classification, err error) {
-	v := s.selectVersion()
-	cl, cls, err := s.getSubServiceClient(v)
-	if err != nil {
-		return nil, err
-	}
-	defer cls()
-
-	resp, err = cl.ClassifyComment(ctx, r)
-	if err != nil {
-		return nil, err
-	}
-
-	resp.Name = "classy.bobsknobshop.gl/classifications/" + uuid.New().String()
-	resp.CreatedOn = time.Now().Unix()
-	resp.ServiceVersion = v.name
-	resp.Comment = r.GetName()
-
-	// TODO: store response
-	log.Printf("%s: Comment '%s' is deemed a '%s'", resp.GetServiceVersion(), r.GetText(), resp.GetCategory())
-
-	// TODO: store metadata
-
+func (s *server) ListClassifications(context.Context, *pb.ListClassificationsRequest) (*pb.ListClassificationsResponse, error) {
+	resp := &pb.ListClassificationsResponse{Classifications: s.classifications}
 	return resp, nil
 }
 
@@ -166,7 +173,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	pb.RegisterClassyServer(s, server{readSubsFile(*subsFile)})
+	pb.RegisterClassyServer(s, &server{readSubsFile(*subsFile), []*pb.Classification{}})
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)

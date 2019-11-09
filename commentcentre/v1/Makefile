@@ -45,6 +45,8 @@ run:
 smoke-test:
 	go run client/client.go \
 		-port=$(LOCAL_PORT) \
+		-classy-host=localhost \
+		-classy-port=9000 \
 		-file=$(shell echo $$PWD)/client/comments.csv
 
 docker-run:

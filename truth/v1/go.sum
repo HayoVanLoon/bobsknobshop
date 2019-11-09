@@ -14,6 +14,8 @@ github.com/HayoVanLoon/genproto v0.0.0-20191103145704-ba177574d03c h1:k3c2pn1Bfl
 github.com/HayoVanLoon/genproto v0.0.0-20191103145704-ba177574d03c/go.mod h1:HLABCVtqGSsmACp1a8Bd9y3W3G9UUx668TEks1kc7AE=
 github.com/HayoVanLoon/genproto v0.0.0-20191109115608-56264990285c h1:i5WZgzwrBk1O/TV0ItEg0uFF3g5y1HfExvZkTDBzUR8=
 github.com/HayoVanLoon/genproto v0.0.0-20191109115608-56264990285c/go.mod h1:HLABCVtqGSsmACp1a8Bd9y3W3G9UUx668TEks1kc7AE=
+github.com/HayoVanLoon/genproto v0.0.0-20191109134014-288e92d01b20 h1:GGQ+poyVlYhohVYB+FDN9a12gz5Ct+u4lQbfSWGMdso=
+github.com/HayoVanLoon/genproto v0.0.0-20191109134014-288e92d01b20/go.mod h1:HLABCVtqGSsmACp1a8Bd9y3W3G9UUx668TEks1kc7AE=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=

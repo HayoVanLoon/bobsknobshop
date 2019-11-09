@@ -20,6 +20,7 @@ package main
 import (
 	"cloud.google.com/go/language/apiv1"
 	"flag"
+	"fmt"
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1"
 	"github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
 	"github.com/HayoVanLoon/genproto/bobsknobshop/peddler/v1"
@@ -162,10 +163,16 @@ func predict(questionMarks int, emo float32, ordered bool) string {
 	}
 }
 
+func (s server) ListClassifications(context.Context, *pb.ListClassificationsRequest) (*pb.ListClassificationsResponse, error) {
+	return nil, fmt.Errorf("not implemented (by design)")
+}
+
 func main() {
 	var port = flag.Int("port", defaultPort, "port to listen on")
+
 	var peddlerHost = flag.String("peddler-host", defaultPeddlerHost, "peddler service host")
 	var peddlerPort = flag.Int("peddler-port", defaultPort, "peddler service port")
+
 	flag.Parse()
 
 	lis, err := net.Listen("tcp", ":"+strconv.Itoa(*port))

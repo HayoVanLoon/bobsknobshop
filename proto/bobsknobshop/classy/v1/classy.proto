@@ -20,6 +20,7 @@ syntax = "proto3";
 package bobsknobshop.classy.v1;
 
 import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
 
 import "bobsknobshop/common/v1/common.proto";
 
@@ -31,8 +32,14 @@ option go_package = "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1;clas
 // A service for classifying things.
 service Classy {
 
+
     // Returns a classification for a comment
     rpc ClassifyComment(common.v1.Comment) returns (Classification) {
+    }
+
+    // Returns all classifications
+    // TODO: debug, remove before go-live
+    rpc ListClassifications(ListClassificationsRequest) returns (ListClassificationsResponse) {
     }
 }
 
@@ -52,4 +59,12 @@ message Classification {
 
     // The predicted category.
     string category = 5;
+}
+
+message ListClassificationsRequest {
+}
+
+message ListClassificationsResponse {
+
+    repeated Classification classifications = 1;
 }
