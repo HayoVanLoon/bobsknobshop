@@ -120,6 +120,7 @@ func analyseText(ctx context.Context, s string) (q int, emo float32, err error) 
 }
 
 // Checks if the customer has ordered a certain product
+// TODO: check on comment timestamp as well
 func (s server) hasOrdered(ctx context.Context, cust, sku string) (bool, error) {
 	cl, closeFn, err := getPeddlerClient(s.peddlerService)
 	if err != nil {
