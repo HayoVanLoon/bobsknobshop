@@ -39,7 +39,7 @@ const (
 
 type server struct {
 	classyService string
-	comments      []*common.Comment
+	comments      map[string]*common.Comment
 }
 
 // Provides a connection-closing function
@@ -80,8 +80,8 @@ func (s *server) CreateComment(ctx context.Context, r *common.Comment) (*common.
 	r.Name = "commentcentre.bobsknobshop.gl/comments/" + uuid.New().String()
 	r.CreatedOn = time.Now().Unix()
 
-	// TODO: store comment
-	s.comments = append(s.comments, r)
+	// TODO: store in separate system, this breaks in multi-instance settings
+	s.comments[r.Name] = r
 
 	resp, err := cl.ClassifyComment(ctx, r)
 	if err != nil {
@@ -94,7 +94,11 @@ func (s *server) CreateComment(ctx context.Context, r *common.Comment) (*common.
 }
 
 func (s *server) ListComments(ctx context.Context, r *pb.ListCommentsRequest) (*pb.ListCommentsResponse, error) {
-	resp := &pb.ListCommentsResponse{Comments: s.comments}
+	var cs []*common.Comment
+	for _, c := range s.comments {
+		cs = append(cs, c)
+	}
+	resp := &pb.ListCommentsResponse{Comments: cs}
 	return resp, nil
 }
 
@@ -112,7 +116,7 @@ func main() {
 
 	s := grpc.NewServer()
 	classyService := *classyHost + ":" + strconv.Itoa(*classyPort)
-	pb.RegisterCommentcentreServer(s, &server{classyService, []*common.Comment{}})
+	pb.RegisterCommentcentreServer(s, &server{classyService, map[string]*common.Comment{}})
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)

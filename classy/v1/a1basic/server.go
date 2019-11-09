@@ -41,53 +41,55 @@ type server struct {
 }
 
 func (s server) ClassifyComment(ctx context.Context, r *common.Comment) (*pb.Classification, error) {
-	q, ex, emo := analyseText(r.GetText())
+	q, emo := analyseText(r.GetText())
 
-	cat := predict(q, ex, emo, len(r.GetText()))
+	cat := predict(q, emo)
 
 	resp := &pb.Classification{Category: cat}
+
+	log.Printf("%v\t %v\t %v\t %s:\t%s", q, emo, o, resp.Category, r.GetText())
 	return resp, nil
 }
 
 // Extracts features from the given text
-func analyseText(s string) (q, ex int, emo float32) {
+func analyseText(s string) (q, emo int) {
+	ex := 0
 	lst := '.'
+	inCap := false
 	for _, c := range s {
 		if i18n.IsQuestionMark(c) {
 			q += 1
 		} else if i18n.IsExclamationMark(c) {
 			ex += 1
-		} else if unicode.IsUpper(c) && !unicode.IsPunct(lst) {
+		} else if unicode.IsUpper(c) && !unicode.IsPunct(lst) && !inCap {
 			emo += 1
+			inCap = true
 		}
 
 		if !unicode.IsSpace(c) {
 			lst = c
+			inCap = false
 		}
 	}
-	emo = emo / float32(len(s))
+	emo = ex + emo
 	return
 }
 
 // Predict the comment's category
-func predict(questionMarks, exclamationMarks int, emo float32, l int) string {
-	log.Printf("%v; %v; %v; %v", questionMarks, exclamationMarks, emo, l)
-
-	if exclamationMarks > 0 {
-		if emo > 0.1 {
+func predict(questionMarks, emo int) string {
+	if questionMarks > 0 {
+		if emo > 1 {
+			return "support"
+		} else if emo > 2 {
 			return "complaint"
 		} else {
-			return "compliment"
+			return "question"
 		}
 	} else {
-		if questionMarks > 0 {
-			return "question"
+		if emo >= 1 {
+			return "complaint"
 		} else {
-			if l > 40 {
-				return "review"
-			} else {
-				return "undetermined"
-			}
+			return "review"
 		}
 	}
 }

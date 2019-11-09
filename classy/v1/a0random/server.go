@@ -47,7 +47,7 @@ func (s *server) ClassifyComment(ctx context.Context, r *common.Comment) (*pb.Cl
 
 // Predict the comment's category
 func predict() string {
-	opts := [5]string{"complaint", "compliment", "question", "review", "undetermined"}
+	opts := [4]string{"complaint", "compliment", "question", "review"}
 	return opts[rand.Intn(len(opts))]
 }
 

@@ -37,6 +37,7 @@ import (
 const (
 	defaultPort        = 9000
 	defaultPeddlerHost = "peddlerService-service"
+	emoThreshold       = 0.1
 )
 
 type server struct {
@@ -72,34 +73,40 @@ func getClient(s string) (peddler.PeddlerClient, func(), error) {
 }
 
 func (s server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (*pb.Classification, error) {
-	q, ex, emo := analyseText(r.Text)
+	q, emo := analyseText(r.Text)
 
 	o, err := s.hasOrdered(ctx, r.GetAuthor(), r.GetTopic())
 	if err != nil {
 		log.Printf("error fetching orders, assuming none exist (%s)", err.Error())
 	}
 
-	resp := &pb.Classification{Category: predict(q, ex, emo, o)}
+	resp := &pb.Classification{Category: predict(q, emo, o)}
+
+	log.Printf("%v\t %v\t %v\t %s:\t%s", q, emo, o, resp.Category, r.GetText())
 	return resp, nil
 }
 
 // Extracts features from the given text
-func analyseText(s string) (q, ex int, emo float32) {
+func analyseText(s string) (q, emo int) {
+	ex := 0
 	lst := '.'
+	inCap := false
 	for _, c := range s {
 		if i18n.IsQuestionMark(c) {
 			q += 1
 		} else if i18n.IsExclamationMark(c) {
 			ex += 1
-		} else if unicode.IsUpper(c) && !unicode.IsPunct(lst) {
+		} else if unicode.IsUpper(c) && !unicode.IsPunct(lst) && !inCap {
 			emo += 1
+			inCap = true
 		}
 
 		if !unicode.IsSpace(c) {
 			lst = c
+			inCap = false
 		}
 	}
-	emo = emo / float32(len(s))
+	emo = ex + emo
 	return
 }
 
@@ -131,24 +138,26 @@ func (s server) hasOrdered(ctx context.Context, cust, sku string) (bool, error) 
 }
 
 // Predict the comment's category
-func predict(questionMarks, exclamationMarks int, emo float32, ordered bool) string {
-	log.Printf("%v; %v; %v; %v", questionMarks, exclamationMarks, emo, ordered)
-
-	if exclamationMarks > 0 {
-		if emo > 0.1 {
-			return "complaint"
+func predict(questionMarks, emo int, ordered bool) string {
+	if ordered {
+		if questionMarks > 0 {
+			if emo >= 1 {
+				return "complaint"
+			} else {
+				return "support"
+			}
 		} else {
-			return "compliment"
+			if emo >= 2 {
+				return "complaint"
+			} else {
+				return "review"
+			}
 		}
 	} else {
 		if questionMarks > 0 {
 			return "question"
 		} else {
-			if ordered {
-				return "review"
-			} else {
-				return "undetermined"
-			}
+			return "review"
 		}
 	}
 }

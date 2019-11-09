@@ -49,7 +49,7 @@ func readCommentsFile(fileName string) [][]string {
 	var rows [][]string
 	for row, err := r.Read(); row != nil; row, err = r.Read() {
 		if err != nil {
-			log.Fatal("error reading comments file")
+			log.Fatalf("error reading comments file %s", err)
 		}
 		if len(row) != 4 {
 			log.Fatalf("invalid row in comments file %s", row)

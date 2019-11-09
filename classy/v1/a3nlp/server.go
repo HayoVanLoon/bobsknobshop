@@ -36,10 +36,8 @@ import (
 )
 
 const (
-	defaultPort         = 9000
-	defaultPeddlerHost  = "peddlerService-service"
-	complaintThreshold  = -.3
-	complimentThreshold = .6
+	defaultPort        = 9000
+	defaultPeddlerHost = "peddlerService-service"
 )
 
 type server struct {
@@ -87,6 +85,8 @@ func (s server) ClassifyComment(ctx context.Context, r *common.Comment) (*pb.Cla
 	}
 
 	resp := &pb.Classification{Category: predict(q, emo, o)}
+
+	log.Printf("%v\t %v\t %v\t %s:\t%s", q, emo, o, resp.Category, r.GetText())
 	return resp, nil
 }
 
@@ -148,18 +148,26 @@ func (s server) hasOrdered(ctx context.Context, cust, sku string) (bool, error) 
 
 // Predict the comment's category
 func predict(questionMarks int, emo float32, ordered bool) string {
-	log.Printf("%v; %v; %v", questionMarks, emo, ordered)
-
-	if emo < complaintThreshold {
-		return "complaint"
-	} else if emo < complimentThreshold {
+	if ordered {
+		if questionMarks > 0 {
+			if emo <= -.2 {
+				return "complaint"
+			} else {
+				return "support"
+			}
+		} else {
+			if emo < -.3 {
+				return "complaint"
+			} else {
+				return "review"
+			}
+		}
+	} else {
 		if questionMarks > 0 {
 			return "question"
 		} else {
 			return "review"
 		}
-	} else {
-		return "compliment"
 	}
 }
 

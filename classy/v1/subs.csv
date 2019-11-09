@@ -1,3 +1,4 @@
-a1basic,localhost,9001,50
-a2extradata,localhost,9002,50
-a3nlp,localhost,9003,0
+a0random,localhost,9009,0
+a1basic,localhost,9001,0
+a2extradata,localhost,9002,0
+a3nlp,localhost,9003,1

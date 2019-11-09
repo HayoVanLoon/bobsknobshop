@@ -101,7 +101,7 @@ func GetConn(t string) (*grpc.ClientConn, error) {
 
 type server struct {
 	services        []versionConfig
-	classifications []*pb.Classification
+	classifications map[string]*pb.Classification
 }
 
 func (s *server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (resp *pb.Classification, err error) {
@@ -122,9 +122,8 @@ func (s *server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (resp
 	resp.ServiceVersion = v.name
 	resp.Comment = r.GetName()
 
-	// TODO: store response
-	log.Printf("%s: %s: '%s'", resp.GetServiceVersion(), r.GetText(), resp.GetCategory())
-	s.classifications = append(s.classifications, resp)
+	// TODO: store in separate system, this breaks in multi-instance settings
+	s.classifications[resp.Name] = resp
 
 	// TODO: store metadata
 
@@ -158,7 +157,11 @@ func (s server) getSubServiceClient(v versionConfig) (pb.ClassyClient, func(), e
 }
 
 func (s *server) ListClassifications(context.Context, *pb.ListClassificationsRequest) (*pb.ListClassificationsResponse, error) {
-	resp := &pb.ListClassificationsResponse{Classifications: s.classifications}
+	var cs []*pb.Classification
+	for _, c := range s.classifications {
+		cs = append(cs, c)
+	}
+	resp := &pb.ListClassificationsResponse{Classifications: cs}
 	return resp, nil
 }
 
@@ -173,7 +176,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	pb.RegisterClassyServer(s, &server{readSubsFile(*subsFile), []*pb.Classification{}})
+	pb.RegisterClassyServer(s, &server{readSubsFile(*subsFile), map[string]*pb.Classification{}})
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
