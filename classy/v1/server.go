@@ -125,8 +125,6 @@ func (s *server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (resp
 	// TODO: store in separate system, this breaks in multi-instance settings
 	s.classifications[resp.Name] = resp
 
-	// TODO: store metadata
-
 	return resp, nil
 }
 
@@ -136,7 +134,7 @@ func (s server) selectVersion() versionConfig {
 	for _, v := range s.services {
 		acc += v.traffic
 	}
-	r := rand.Intn(acc)
+	r := rand.Intn(acc) + 1
 	acc = 0
 	for _, v := range s.services {
 		if v.traffic+acc >= r {
