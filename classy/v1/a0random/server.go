@@ -21,14 +21,13 @@ import (
 	"flag"
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1"
 	"github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
-	"github.com/HayoVanLoon/go-commons/i18n"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"log"
+	"math/rand"
 	"net"
 	"strconv"
-	"unicode"
 )
 
 const (
@@ -36,59 +35,19 @@ const (
 )
 
 type server struct {
-	peddlerService string
 }
 
 func (s *server) ClassifyComment(ctx context.Context, r *common.Comment) (*pb.Classification, error) {
-	q, ex, emo := analyseText(r.GetText())
-
-	cat := predict(ex, q, emo, len(r.GetText()))
+	cat := predict()
 
 	resp := &pb.Classification{Category: cat}
 	return resp, nil
 }
 
-// Extracts features from the given text
-func analyseText(s string) (q, ex int, emo float32) {
-	lst := '.'
-	for _, c := range s {
-		if i18n.IsQuestionMark(c) {
-			q += 1
-		} else if c == '!' {
-			ex += 1
-		} else if unicode.IsUpper(c) && !unicode.IsPunct(lst) {
-			emo += 1
-		}
-
-		if !unicode.IsSpace(c) {
-			lst = c
-		}
-	}
-	emo = emo / float32(len(s))
-	return
-}
-
 // Predict the comment's category
-func predict(questionMarks, exclamationMarks int, emo float32, l int) string {
-	log.Printf("%v; %v; %v; %v", questionMarks, exclamationMarks, emo, l)
-
-	if exclamationMarks > 0 {
-		if emo > 0 {
-			return "complaint"
-		} else {
-			return "compliment"
-		}
-	} else {
-		if questionMarks > 0 {
-			return "question"
-		} else {
-			if l > 40 {
-				return "review"
-			} else {
-				return "undetermined"
-			}
-		}
-	}
+func predict() string {
+	opts := [5]string{"complaint", "compliment", "question", "review", "undetermined"}
+	return opts[rand.Intn(len(opts))]
 }
 
 func main() {

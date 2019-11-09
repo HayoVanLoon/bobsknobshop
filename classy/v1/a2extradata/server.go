@@ -22,6 +22,7 @@ import (
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1"
 	commonpb "github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
 	"github.com/HayoVanLoon/genproto/bobsknobshop/peddler/v1"
+	"github.com/HayoVanLoon/go-commons/i18n"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -70,27 +71,25 @@ func getClient(s string) (peddler.PeddlerClient, func(), error) {
 }
 
 func (s server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (*pb.Classification, error) {
-	qc, ec, emo := analyseText(r.Text)
+	q, ex, emo := analyseText(r.Text)
 
-	ords, err := s.getOrders(ctx, r.Author)
+	o, err := s.hasOrdered(ctx, r.GetAuthor(), r.GetTopic())
 	if err != nil {
 		log.Printf("error fetching orders, assuming none exist (%s)", err.Error())
-		ords = []*commonpb.Order{}
 	}
 
-	cat := calcOutcome(ec, emo, qc, strings.ToUpper(r.GetTopic()), ords)
-
-	resp := &pb.Classification{Category: cat}
+	resp := &pb.Classification{Category: predict(q, ex, emo, o)}
 	return resp, nil
 }
 
-func analyseText(s string) (qc, ec, emo int) {
+// Extracts features from the given text
+func analyseText(s string) (q, ex int, emo float32) {
 	lst := '.'
 	for _, c := range s {
-		if c == '?' {
-			qc += 1
+		if i18n.IsQuestionMark(c) {
+			q += 1
 		} else if c == '!' {
-			ec += 1
+			ex += 1
 		} else if unicode.IsUpper(c) && !unicode.IsPunct(lst) {
 			emo += 1
 		}
@@ -99,45 +98,57 @@ func analyseText(s string) (qc, ec, emo int) {
 			lst = c
 		}
 	}
+	emo = emo / float32(len(s))
 	return
 }
 
-func (s server) getOrders(ctx context.Context, cust string) ([]*commonpb.Order, error) {
+// Checks if the customer has ordered a certain product
+func (s server) hasOrdered(ctx context.Context, cust, sku string) (bool, error) {
 	cl, closeFn, err := getClient(s.peddlerService)
 	if err != nil {
 		log.Printf("error creating client for %s", s.peddlerService)
-		return nil, err
+		return false, err
 	}
 	defer closeFn()
 
 	resp, err := cl.SearchOrders(ctx, &peddler.SearchOrdersRequest{Customer: []string{cust}})
 	if err != nil {
 		log.Print("error fetching orders")
-		return nil, err
+		return false, err
 	}
 
-	return resp.Orders, nil
+	upperSku := strings.ToUpper(sku)
+	for _, o := range resp.GetOrders() {
+		for _, ol := range o.GetOrderLines() {
+			if strings.ToUpper(ol.GetSku()) == upperSku {
+				return true, nil
+			}
+		}
+	}
+
+	return false, nil
 }
 
-func calcOutcome(ec, emo, qc int, sku string, ords []*commonpb.Order) string {
-	ordered := false
-	for _, o := range ords {
-		for _, ol := range o.GetOrderLines() {
-			ordered = ordered || strings.ToUpper(ol.GetSku()) == sku
-		}
-		if ordered {
-			break
-		}
-	}
+// Predict the comment's category
+func predict(questionMarks, exclamationMarks int, emo float32, ordered bool) string {
+	log.Printf("%v; %v; %v; %v", questionMarks, exclamationMarks, emo, ordered)
 
-	if ec > 0 && emo < 2 {
-		return "compliment"
-	} else if emo > 2 {
-		return "complaint"
-	} else if qc > 0 && !ordered {
-		return "question"
+	if exclamationMarks > 0 {
+		if emo > 0 {
+			return "complaint"
+		} else {
+			return "compliment"
+		}
 	} else {
-		return "comment"
+		if questionMarks > 0 {
+			return "question"
+		} else {
+			if ordered {
+				return "review"
+			} else {
+				return "undetermined"
+			}
+		}
 	}
 }
 

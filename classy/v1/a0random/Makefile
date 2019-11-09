@@ -13,19 +13,17 @@
 # limitations under the License.
 
 PROJECT_NAME := bobsknobshop
-MODULE_NAME := commentcentre
-VERSION := v1
+MODULE_NAME := classy
+VERSION := v1_a0random
 
 # Docker-related
 IMAGE_NAME := $(PROJECT_NAME)_$(MODULE_NAME)_$(VERSION)
 TAG := latest
 
-LOCAL_PORT := 9010
+LOCAL_PORT := 9009
+NODE_PORT := 30009
 
 .PHONY:
-
-clean:
-	go clean
 
 protoc:
 	@echo Go App, skipped
@@ -38,14 +36,7 @@ build:
 
 run:
 	go run server.go \
-		-port=$(LOCAL_PORT) \
-		-classy-host=localhost \
-		-classy-port=9000
-
-smoke-test:
-	go run client/client.go \
-		-port=$(LOCAL_PORT) \
-		-file=$(shell echo $$PWD)/client/comments.csv
+		-port=$(LOCAL_PORT)
 
 docker-run:
 	docker run --network="host" $(IMAGE_NAME) \
@@ -60,6 +51,3 @@ test-minikube:
 push-gcr:
 	docker tag $(IMAGE_NAME) gcr.io/$(PROJECT_ID)/$(IMAGE_NAME):$(TAG)
 	docker push gcr.io/$(PROJECT_ID)/$(IMAGE_NAME)
-
-update-deps:
-	go get -u ./...

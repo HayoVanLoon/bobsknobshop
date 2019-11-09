@@ -12,6 +12,8 @@ github.com/HayoVanLoon/genproto v0.0.0-20191101080107-310ba595feef h1:GrxC8NnmEf
 github.com/HayoVanLoon/genproto v0.0.0-20191101080107-310ba595feef/go.mod h1:HLABCVtqGSsmACp1a8Bd9y3W3G9UUx668TEks1kc7AE=
 github.com/HayoVanLoon/genproto v0.0.0-20191103145704-ba177574d03c h1:k3c2pn1BflxquznP9NHGXVXO3malRbqYZz35BcLBHTk=
 github.com/HayoVanLoon/genproto v0.0.0-20191103145704-ba177574d03c/go.mod h1:HLABCVtqGSsmACp1a8Bd9y3W3G9UUx668TEks1kc7AE=
+github.com/HayoVanLoon/genproto v0.0.0-20191109115608-56264990285c h1:i5WZgzwrBk1O/TV0ItEg0uFF3g5y1HfExvZkTDBzUR8=
+github.com/HayoVanLoon/genproto v0.0.0-20191109115608-56264990285c/go.mod h1:HLABCVtqGSsmACp1a8Bd9y3W3G9UUx668TEks1kc7AE=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
@@ -41,6 +43,8 @@ golang.org/x/net v0.0.0-20191101175033-0deb6923b6d9 h1:DPz9iiH3YoKiKhX/ijjoZvT0V
 golang.org/x/net v0.0.0-20191101175033-0deb6923b6d9/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
 golang.org/x/net v0.0.0-20191108063844-7e6e90b9ea88 h1:Duq71GDCs3Cs8n6cRINv6SutZHHvYwzL28LBv73RiNU=
 golang.org/x/net v0.0.0-20191108063844-7e6e90b9ea88/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
+golang.org/x/net v0.0.0-20191109021931-daa7c04131f5 h1:bHNaocaoJxYBo5cw41UyTMLjYlb8wPY7+WFrnklbHOM=
+golang.org/x/net v0.0.0-20191109021931-daa7c04131f5/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
 golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be/go.mod h1:N/0e6XlmueqKjAGxoOufVs8QHGRruUQn6yWY3a++T0U=
 golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20181108010431-42b317875d0f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
@@ -66,11 +70,15 @@ google.golang.org/genproto v0.0.0-20180817151627-c66870c02cf8/go.mod h1:JiN7NxoA
 google.golang.org/genproto v0.0.0-20190819201941-24fa4b261c55/go.mod h1:DMBHOl98Agz4BDEuKkezgsaosCRResVns1a3J2ZsMNc=
 google.golang.org/genproto v0.0.0-20191028173616-919d9bdd9fe6 h1:UXl+Zk3jqqcbEVV7ace5lrt4YdA4tXiz3f/KbmD29Vo=
 google.golang.org/genproto v0.0.0-20191028173616-919d9bdd9fe6/go.mod h1:n3cpQtvxv34hfy77yVDNjmbRyujviMdxYliBSkLhpCc=
+google.golang.org/genproto v0.0.0-20191108220845-16a3f7862a1a h1:Ob5/580gVHBJZgXnff1cZDbG+xLtMVE5mDRTe+nIsX4=
+google.golang.org/genproto v0.0.0-20191108220845-16a3f7862a1a/go.mod h1:n3cpQtvxv34hfy77yVDNjmbRyujviMdxYliBSkLhpCc=
 google.golang.org/grpc v1.19.0/go.mod h1:mqu4LbDTu4XGKhr4mRzUsmM4RtVoemTSY81AxZiDr8c=
 google.golang.org/grpc v1.23.0/go.mod h1:Y5yQAOtifL1yxbo5wqy6BxZv8vAUGQwXBOALyacEbxg=
 google.golang.org/grpc v1.24.0 h1:vb/1TCsVn3DcJlQ0Gs1yB1pKI6Do2/QNwxdKqmc/b0s=
 google.golang.org/grpc v1.24.0/go.mod h1:XDChyiUovWa60DnaeDeZmSW86xtLtjtZbwvSiRnRtcA=
 google.golang.org/grpc v1.25.0 h1:ItERT+UbGdX+s4u+nQNlVM/Q7cbmf7icKfvzbWqVtq0=
 google.golang.org/grpc v1.25.0/go.mod h1:c3i+UQWmh7LiEpx4sFZnkU36qjEYZ0imhYfXVyQciAY=
+google.golang.org/grpc v1.25.1 h1:wdKvqQk7IttEw92GoRyKG2IDrUIpgpj6H6m81yfeMW0=
+google.golang.org/grpc v1.25.1/go.mod h1:c3i+UQWmh7LiEpx4sFZnkU36qjEYZ0imhYfXVyQciAY=
 honnef.co/go/tools v0.0.0-20190102054323-c2f93a96b099/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
 honnef.co/go/tools v0.0.0-20190523083050-ea95bdfd59fc/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
