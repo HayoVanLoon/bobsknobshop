@@ -107,22 +107,29 @@ func calculateKpi(host, classyHost string, port, classyPort int, rows [][]string
 		}
 	}
 
-	kpisAcc := map[string]int{}
+	// complaints: 3, questions:2 , support: 2, reviews: 7
+	// 2 : 2 : 2 : 6
+	ws := map[string]float32{
+		"complaint": 2, "question": 2, "support": 2, "review": 6,
+	}
+	totalWs := float32(12)
+
+	kpisAcc := map[string]float32{}
 	kpisCnt := map[string]int{}
-	for _, c := range cls {
-		if co, ok := cos[c.GetComment()]; ok {
+	for _, cl := range cls {
+		if co, ok := cos[cl.GetComment()]; ok {
 			if lbl, ok := lbls[co.GetName()]; ok {
-				if c.GetCategory() == lbl {
-					kpisAcc[c.GetServiceVersion()] += 1
+				if cl.GetCategory() != lbl {
+					kpisAcc[cl.GetServiceVersion()] += totalWs / ws[cl.GetCategory()]
 				}
-				kpisCnt[c.GetServiceVersion()] += 1
+				kpisCnt[cl.GetServiceVersion()] += 1
 			}
 		}
 	}
 
 	kpis := map[string]float32{}
-	for version, correct := range kpisAcc {
-		kpis[version] = float32(correct) / float32(kpisCnt[version])
+	for version, acc := range kpisAcc {
+		kpis[version] = acc / float32(kpisCnt[version])
 	}
 
 	return kpis
