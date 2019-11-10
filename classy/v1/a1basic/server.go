@@ -47,7 +47,7 @@ func (s server) ClassifyComment(ctx context.Context, r *common.Comment) (*pb.Cla
 
 	resp := &pb.Classification{Category: cat}
 
-	log.Printf("%v\t %v\t %v\t %s:\t%s", q, emo, o, resp.Category, r.GetText())
+	log.Printf("%v\t %v\t %v\t %s:\t%s", q, emo, resp.Category, r.GetText())
 	return resp, nil
 }
 
