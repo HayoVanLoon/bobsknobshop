@@ -27,7 +27,7 @@ protoc:
 	# add specific recipes here as needed / convenient
 	$(MAKE) -C proto protoc-go
 
-update-deps: update-deps-classy update-deps-peddler update-deps-truth
+update-deps: update-deps-classy update-deps-commentcentre update-deps-peddler update-deps-truth
 
 
 # Module-Specific Recipes
@@ -47,7 +47,7 @@ smoke-test-classy:
 run-commentcentre:
 	$(MAKE) -C commentcentre run
 
-update-deps-classy:
+update-deps-commentcentre:
 	@$(MAKE) -C commentcentre update-deps
 
 smoke-test-commentcentre:

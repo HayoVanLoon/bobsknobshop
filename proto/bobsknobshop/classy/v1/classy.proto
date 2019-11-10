@@ -20,7 +20,6 @@ syntax = "proto3";
 package bobsknobshop.classy.v1;
 
 import "google/api/annotations.proto";
-import "google/protobuf/empty.proto";
 
 import "bobsknobshop/common/v1/common.proto";
 

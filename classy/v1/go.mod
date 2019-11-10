@@ -3,7 +3,7 @@ module github.com/HayoVanLoon/bobsknobshop/classy/v1
 go 1.13
 
 require (
-	github.com/HayoVanLoon/genproto v0.0.0-20191109134014-288e92d01b20
+	github.com/HayoVanLoon/genproto v0.0.0-20191110142622-abff02d4b8eb
 	github.com/google/uuid v1.1.1
 	golang.org/x/net v0.0.0-20191109021931-daa7c04131f5
 	golang.org/x/sys v0.0.0-20191105231009-c1f44814a5cd // indirect

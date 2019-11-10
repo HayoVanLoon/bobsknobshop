@@ -38,7 +38,8 @@ build:
 
 run:
 	go run server.go \
-		-port=$(LOCAL_PORT)
+		-port=$(LOCAL_PORT) \
+		-file=$(PWD)/../../example/order-data.json
 
 update-deps:
 	go get -u ./...

@@ -36,7 +36,7 @@ service Commentcentre {
     }
 
     // Returns all comments
-    // TODO: debug, remove before go-live
+    // TODO: add paging or deprecate
     rpc ListComments(ListCommentsRequest) returns (ListCommentsResponse) {
     }
 }

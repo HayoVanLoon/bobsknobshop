@@ -6,6 +6,12 @@ github.com/HayoVanLoon/genproto v0.0.0-20191109115608-56264990285c h1:i5WZgzwrBk
 github.com/HayoVanLoon/genproto v0.0.0-20191109115608-56264990285c/go.mod h1:HLABCVtqGSsmACp1a8Bd9y3W3G9UUx668TEks1kc7AE=
 github.com/HayoVanLoon/genproto v0.0.0-20191109134014-288e92d01b20 h1:GGQ+poyVlYhohVYB+FDN9a12gz5Ct+u4lQbfSWGMdso=
 github.com/HayoVanLoon/genproto v0.0.0-20191109134014-288e92d01b20/go.mod h1:HLABCVtqGSsmACp1a8Bd9y3W3G9UUx668TEks1kc7AE=
+github.com/HayoVanLoon/genproto v0.0.0-20191109142957-d1a9ef1763cf h1:jyKev+9NYKqoibYfYb65QccE6n+s60eDzHO9VMvBMlI=
+github.com/HayoVanLoon/genproto v0.0.0-20191109142957-d1a9ef1763cf/go.mod h1:HLABCVtqGSsmACp1a8Bd9y3W3G9UUx668TEks1kc7AE=
+github.com/HayoVanLoon/genproto v0.0.0-20191110133301-3b5ef9773d46 h1:xob7CNkwYHRBGV9rhEUfzFOxyozQjZvoPYN6ubJ84+k=
+github.com/HayoVanLoon/genproto v0.0.0-20191110133301-3b5ef9773d46/go.mod h1:HLABCVtqGSsmACp1a8Bd9y3W3G9UUx668TEks1kc7AE=
+github.com/HayoVanLoon/genproto v0.0.0-20191110142622-abff02d4b8eb h1:5mxJGFAT5HlLnTcgcw65gpTSTku6H68jQHvMMpfmg5c=
+github.com/HayoVanLoon/genproto v0.0.0-20191110142622-abff02d4b8eb/go.mod h1:HLABCVtqGSsmACp1a8Bd9y3W3G9UUx668TEks1kc7AE=
 github.com/HayoVanLoon/go-commons v0.0.0-20191109122259-b8ffa68ca2d4 h1:tibJt8QUA+Ii9BE8ffmLbtLE0HF1bKSllB8Slwq97co=
 github.com/HayoVanLoon/go-commons v0.0.0-20191109122259-b8ffa68ca2d4/go.mod h1:nghygoXFiMuK7Gen04EPI0ihTr3ZaHFpCPMw7B49TPQ=
 github.com/HayoVanLoon/go-commons v0.0.0-20191109125211-99fc24ab33e0 h1:mHRRfL08LO4cEsoKvfUtAl9VDlNjxA4eRQZY2IGL5qo=

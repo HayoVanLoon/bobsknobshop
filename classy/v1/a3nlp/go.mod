@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	cloud.google.com/go v0.47.0
-	github.com/HayoVanLoon/genproto v0.0.0-20191109134014-288e92d01b20
+	github.com/HayoVanLoon/genproto v0.0.0-20191110142622-abff02d4b8eb
 	github.com/HayoVanLoon/go-commons v0.0.0-20191109125211-99fc24ab33e0
 	github.com/golang/groupcache v0.0.0-20191027212112-611e8accdfc9 // indirect
 	github.com/google/go-cmp v0.3.1 // indirect

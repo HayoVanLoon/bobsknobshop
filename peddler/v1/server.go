@@ -39,8 +39,8 @@ const (
 	defaultPort = 9000
 )
 
-func createOrders() []common.Order {
-	bs, err := ioutil.ReadFile("data.json")
+func createOrders(fileName string) []common.Order {
+	bs, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -61,9 +61,8 @@ func createOrders() []common.Order {
 	return os
 }
 
-var orders = createOrders()
-
 type server struct {
+	orders []common.Order
 }
 
 func newServer() *server {
@@ -77,13 +76,13 @@ func (s server) SearchOrders(ctx context.Context, r *pb.SearchOrdersRequest) (*p
 	sort.Slice(ps, func(i, j int) bool { return ps[i] < ps[j] })
 
 	var os []*common.Order
-	for i, o := range orders {
+	for i, o := range s.orders {
 		added := false
 		oc := strings.ToUpper(o.Client)
 		for _, c := range cs {
 			if oc == strings.ToUpper(c) {
 				added = true
-				os = append(os, &orders[i])
+				os = append(os, &s.orders[i])
 				break
 			}
 		}
@@ -95,7 +94,7 @@ func (s server) SearchOrders(ctx context.Context, r *pb.SearchOrdersRequest) (*p
 			for _, ol := range o.GetOrderLines() {
 				if p == strings.ToUpper(ol.Sku) {
 					added = true
-					os = append(os, &orders[i])
+					os = append(os, &s.orders[i])
 					break
 				}
 			}
@@ -111,6 +110,8 @@ func (s server) SearchOrders(ctx context.Context, r *pb.SearchOrdersRequest) (*p
 
 func main() {
 	var port = flag.Int("port", defaultPort, "port to listen on")
+
+	var fileName = flag.String("file", "comments.csv", "comment file")
 	flag.Parse()
 
 	lis, err := net.Listen("tcp", ":"+strconv.Itoa(*port))
@@ -119,7 +120,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	pb.RegisterPeddlerServer(s, newServer())
+	pb.RegisterPeddlerServer(s, server{createOrders(*fileName)})
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)

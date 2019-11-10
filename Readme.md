@@ -1,21 +1,22 @@
 # Example Project: Bob's Knob Shop
 
-PLACEHOLDER: Project summary describing business goals of the project
+This is an example project for a fictional web shop, Bob's Knob Shop. Any 
+resemblance to actual persons, living or dead, is entirely coincidental.
 
-### General Tools
+## Requirements
 The following tools must have been installed and need to be available on the 
 system path.
-* Google Cloud SDK (gcloud, gsutil, bq)
+* Go v1.13
+* Protocol Buffers compiler (protoc)
 * GNU Make
 
-## Setting Up The Dev Environment
-The following sets up a local development environment. 
+## Dependencies
+The Protocol Buffers files import from the GoogleApis repository. Therefore a 
+local clone of GoogleApis repository is required. The path to this repository 
+needs to be configured in `personal-envs.sh`
 
-PLACEHOLDER: Describe changes that take place by running this recipe in sufficent detail
-
-PLACEHOLDER: Describe parameters in for recipe call. 
-PLACEHOLDER: Explicitly mention which are optional.
-PLACEHOLDER: Explicitly mention when there are no parameters. 
-```bash
-make dev-env
-```
+### Classification Version KPIs
+a0random: 0.8961039
+a1basic: 0.64285713
+a2extradata: 0.5
+a3nlp: 0.14285715

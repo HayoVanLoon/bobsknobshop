@@ -23,7 +23,7 @@ import (
 	"fmt"
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/truth/v1"
 	"google.golang.org/grpc"
-	"log"
+	"sort"
 	"strconv"
 	"time"
 )
@@ -33,47 +33,31 @@ const (
 	defaultPort = 9000
 )
 
-func getConn(host string, port int) (*grpc.ClientConn, error) {
-	conn, err := grpc.Dial(host+":"+strconv.Itoa(port), grpc.WithInsecure())
-	if err != nil {
-		return nil, fmt.Errorf("did not connect: %v", err)
-	}
-	return conn, nil
-}
-
-func createMessage(host string, port int, s string) error {
-	r := &pb.GetServiceKpiRequest{
-		Service: s,
-	}
-
-	conn, err := getConn(host, port)
-	defer func() {
-		if err := conn.Close(); err != nil {
-			log.Panicf("error closing connection: %v", err)
-		}
-	}()
-
+func getClassyKpis(host string, port int) {
+	r := &pb.GetServiceKpiRequest{Name: "classy"}
+	conn, _ := grpc.Dial(host+":"+strconv.Itoa(port), grpc.WithInsecure())
+	defer func() { _ = conn.Close() }()
 	cl := pb.NewTruthClient(conn)
-
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	resp, err := cl.GetServiceKpi(ctx, r)
-
-	log.Printf("%v\n", resp)
 	if err != nil {
-		log.Printf("%v\n", err)
+		fmt.Println(err)
 	}
 
-	return err
+	sort.Slice(resp.Versions, func(i, j int) bool { return resp.Versions[i].GetName() < resp.Versions[j].GetName() })
+	for _, v := range resp.Versions {
+		fmt.Printf("%s: %v\n", v.GetName(), v.GetValue())
+	}
 }
 
 // Meant for debugging purposes.
 func main() {
 	var host = flag.String("host", defaultHost, "service host")
 	var port = flag.Int("port", defaultPort, "service port")
+
 	flag.Parse()
 
-	_ = createMessage(*host, *port, "Alice")
-	_ = createMessage(*host, *port, "Cathy")
+	getClassyKpis(*host, *port)
 }

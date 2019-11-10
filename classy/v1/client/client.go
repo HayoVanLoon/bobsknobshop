@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 package main
 
 import (
@@ -24,7 +23,6 @@ import (
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1"
 	commonpb "github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
 	"google.golang.org/grpc"
-	"log"
 	"strconv"
 	"time"
 )
@@ -47,7 +45,7 @@ func classifyComment(host string, port int, c *commonpb.Comment) {
 	if err != nil {
 		panic(err)
 	}
-	log.Printf("%s\n", resp)
+	fmt.Printf("%s\n", resp)
 }
 
 func listClassifications(host string, port int) {

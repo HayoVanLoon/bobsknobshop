@@ -22,7 +22,6 @@ import (
 	"encoding/csv"
 	"flag"
 	"fmt"
-	"github.com/HayoVanLoon/genproto/bobsknobshop/classy/v1"
 	pb "github.com/HayoVanLoon/genproto/bobsknobshop/commentcentre/v1"
 	"github.com/HayoVanLoon/genproto/bobsknobshop/common/v1"
 	"google.golang.org/grpc"
@@ -33,26 +32,24 @@ import (
 )
 
 const (
-	defaultHost       = "localhost"
-	defaultPort       = 9010
-	defaultClassyHost = "localhost"
-	defaultClassyPort = 9000
+	defaultHost = "localhost"
+	defaultPort = 9010
 )
 
 func readCommentsFile(fileName string) [][]string {
 	f, err := os.Open(fileName)
 	if err != nil {
-		log.Fatal("could not open comments file")
+		panic(err)
 	}
 	r := csv.NewReader(f)
 
 	var rows [][]string
 	for row, err := r.Read(); row != nil; row, err = r.Read() {
 		if err != nil {
-			log.Fatalf("error reading comments file %s", err)
+			panic(err)
 		}
 		if len(row) != 4 {
-			log.Fatalf("invalid row in comments file %s", row)
+			panic(fmt.Errorf("invalid row in comments file %s", row))
 		}
 		rows = append(rows, row)
 	}
@@ -88,64 +85,9 @@ func createComment(host string, port int, c *common.Comment) {
 
 	resp, err := cl.CreateComment(ctx, c)
 	if err != nil {
-		log.Fatal(err.Error())
+		fmt.Println(err)
 	}
-
-	log.Printf("%s\n", resp)
-}
-
-func calculateKpi(host, classyHost string, port, classyPort int, rows [][]string) map[string]float32 {
-	cls := getClassifications(classyHost, classyPort)
-	cos := getComments(host, port)
-
-	lbls := map[string]string{}
-	for _, row := range rows {
-		for _, co := range cos {
-			if co.GetAuthor() == row[0] && co.GetText() == row[2] {
-				lbls[co.GetName()] = row[3]
-			}
-		}
-	}
-
-	// complaints: 3, questions:2 , support: 2, reviews: 7
-	// 2 : 2 : 2 : 6
-	ws := map[string]float32{
-		"complaint": 2, "question": 2, "support": 2, "review": 6,
-	}
-	totalWs := float32(12)
-
-	kpisAcc := map[string]float32{}
-	kpisCnt := map[string]int{}
-	for _, cl := range cls {
-		if co, ok := cos[cl.GetComment()]; ok {
-			if lbl, ok := lbls[co.GetName()]; ok {
-				if cl.GetCategory() != lbl {
-					kpisAcc[cl.GetServiceVersion()] += totalWs / ws[cl.GetCategory()]
-				}
-				kpisCnt[cl.GetServiceVersion()] += 1
-			}
-		}
-	}
-
-	kpis := map[string]float32{}
-	for version, acc := range kpisAcc {
-		kpis[version] = acc / float32(kpisCnt[version])
-	}
-
-	return kpis
-}
-
-func getClassifications(host string, port int) []*classy.Classification {
-	conn, _ := grpc.Dial(host+":"+strconv.Itoa(port), grpc.WithInsecure())
-	defer func() { _ = conn.Close() }()
-	cl := classy.NewClassyClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	resp, err := cl.ListClassifications(ctx, &classy.ListClassificationsRequest{})
-	if err != nil {
-		panic(err)
-	}
-	return resp.GetClassifications()
+	fmt.Println(resp)
 }
 
 func getComments(host string, port int) map[string]*common.Comment {
@@ -165,15 +107,11 @@ func getComments(host string, port int) map[string]*common.Comment {
 	return xs
 }
 
-// Meant for debugging purposes.
 func main() {
 	var host = flag.String("host", defaultHost, "service host")
 	var port = flag.Int("port", defaultPort, "service port")
 
 	var fileName = flag.String("file", "comments.csv", "comment file")
-
-	var classyHost = flag.String("classy-host", defaultClassyHost, "classy service host")
-	var classyPort = flag.Int("classy-port", defaultClassyPort, "classy service port")
 
 	flag.Parse()
 
@@ -182,8 +120,5 @@ func main() {
 	for _, c := range toComments(rows) {
 		createComment(*host, *port, &c)
 	}
-
-	kpis := calculateKpi(*host, *classyHost, *port, *classyPort, rows)
-
-	fmt.Println(kpis)
+	fmt.Println(getComments(*host, *port))
 }
