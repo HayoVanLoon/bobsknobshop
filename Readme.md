@@ -16,7 +16,7 @@ local clone of GoogleApis repository is required. The path to this repository
 needs to be configured in `personal-envs.sh`
 
 ### Classification Version KPIs
-a0random: 0.8961039
+a0random: 0.8952381
 a1basic: 0.64285713
-a2extradata: 0.5
-a3nlp: 0.14285715
+a2extradata: 0.42857143
+a3nlp: 0.071428575
