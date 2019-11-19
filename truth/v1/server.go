@@ -104,6 +104,7 @@ func (s server) calculateClassyKpi(ctx context.Context, r *pb.GetServiceKpiReque
 			if lbl, ok := lbls[cl.GetComment()]; ok {
 				if cl.GetCategory() != lbl {
 					acc[cl.GetServiceVersion()] += ws[cl.GetCategory()]
+					log.Printf("fail: %s as %s: %s", lbl, cl.GetCategory(), cos[cl.GetComment()])
 				}
 				cnt[cl.GetServiceVersion()] += 1
 			}
