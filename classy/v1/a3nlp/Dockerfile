@@ -16,20 +16,18 @@ FROM golang:alpine AS builder
 
 RUN apk --update --no-cache add git protobuf
 
-WORKDIR /go/src/app
+WORKDIR /build
 
 COPY . .
 
 RUN go get -d -v ./...
-RUN go install -v ./...
-
-RUN ls /go/bin
+RUN CGO_ENABLED=0 GOOS=linux go build -o app
 
 # Next stage
 FROM alpine
 
 RUN apk --update --no-cache add ca-certificates openssl
 
-COPY --from=builder /go/bin/app /usr/local/bin
+COPY --from=builder /build/app /usr/local/bin
 
 CMD ["/usr/local/bin/app"]
