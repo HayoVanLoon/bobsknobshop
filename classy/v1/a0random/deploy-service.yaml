@@ -15,10 +15,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: classy-v1-a3nlp-service
+  name: classy-v1-a0random-service
+  labels:
+    serviceGroup: classy
+    internalService: true
+    subversion: a0random
 spec:
   selector:
-    app: classy-v1-a3nlp
+    app: classy-v1-a0random
   ports:
     - protocol: TCP
       port: 9000
@@ -28,22 +32,23 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: classy-v1-a3nlp-deployment
+  name: classy-v1-a0random-deployment
   labels:
-    app: classy-v1-a3nlp
+    app: classy-v1-a0random
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: classy-v1-a3nlp
+      app: classy-v1-a0random
   template:
     metadata:
       labels:
-        app: classy-v1-a3nlp
+        app: classy-v1-a0random
+        subversion: a0random
     spec:
       containers:
-        - name: classy-v1-a3nlp
-          image: bobsknobshop_classy_v1_a3nlp
+        - name: classy-v1-a0random
+          image: bobsknobshop_classy_v1_a0random
           imagePullPolicy: Never
           ports:
             - containerPort: 9000

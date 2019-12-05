@@ -20,6 +20,8 @@ WORKDIR /build
 
 COPY . .
 
+ENV GO111MODULE=on
+
 RUN go get -d -v ./...
 RUN CGO_ENABLED=0 GOOS=linux go build -o app
 
