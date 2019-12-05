@@ -15,15 +15,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: classy-v1-a0random-service
+  name: classy-v1-a2extradata-service
   labels:
     serviceGroup: classy
     internalService: true
-    subversion: a0random
+    subversion: a2extradata
 spec:
   type: ClusterIP
   selector:
-    app: classy-v1-a0random
+    app: classy-v1-a2extradata
   ports:
     - protocol: TCP
       port: 9000
@@ -33,22 +33,22 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: classy-v1-a0random-deployment
+  name: classy-v1-a2extradata-deployment
   labels:
-    app: classy-v1-a0random
+    app: classy-v1-a2extradata
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: classy-v1-a0random
+      app: classy-v1-a2extradata
   template:
     metadata:
       labels:
-        app: classy-v1-a0random
+        app: classy-v1-a2extradata
     spec:
       containers:
-        - name: classy-v1-a0random
-          image: bobsknobshop_classy_v1_a0random
+        - name: classy-v1-a2extradata
+          image: bobsknobshop_classy_v1_a2extradata
           imagePullPolicy: Never
           ports:
             - containerPort: 9000

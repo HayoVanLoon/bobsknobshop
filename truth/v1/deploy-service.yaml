@@ -15,35 +15,39 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: commentcentre-v1-service
+  name: truth-v1-service
+  labels:
+    serviceGroup: truth
 spec:
+  type: NodePort
   selector:
-    app: commentcentre-v1
+    app: truth-v1
   ports:
     - protocol: TCP
       port: 9000
+      nodePort: 30200
 
 ---
 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: commentcentre-v1-deployment
+  name: truth-v1-deployment
   labels:
-    app: commentcentre-v1
+    app: truth-v1
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: commentcentre-v1
+      app: truth-v1
   template:
     metadata:
       labels:
-        app: commentcentre-v1
+        app: truth-v1
     spec:
       containers:
-        - name: commentcentre-v1
-          image: bobsknobshop_commentcentre_v1
+        - name: truth-v1
+          image: bobsknobshop_truth_v1
           imagePullPolicy: Never
           ports:
             - containerPort: 9000
