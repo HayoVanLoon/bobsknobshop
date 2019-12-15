@@ -79,7 +79,10 @@ func (s server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (*pb.C
 		log.Printf("error fetching orders, assuming none exist (%s)", err.Error())
 	}
 
-	resp := &pb.Classification{Category: predict(q, emo, o)}
+	resp := &pb.Classification{
+		ServiceVersion: "a2extradata",
+		Category:       predict(q, emo, o),
+	}
 
 	log.Printf("%v\t %v\t %v\t %s:\t%s", q, emo, o, resp.Category, r.GetText())
 	return resp, nil

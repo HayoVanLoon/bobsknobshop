@@ -45,7 +45,10 @@ func (s server) ClassifyComment(ctx context.Context, r *common.Comment) (*pb.Cla
 
 	cat := predict(q, emo)
 
-	resp := &pb.Classification{Category: cat}
+	resp := &pb.Classification{
+		ServiceVersion: "a1basic",
+		Category:       cat,
+	}
 
 	log.Printf("%v\t %v\t %v\t %s:\t%s", q, emo, resp.Category, r.GetText())
 	return resp, nil

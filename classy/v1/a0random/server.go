@@ -41,7 +41,11 @@ type server struct {
 func (s *server) ClassifyComment(ctx context.Context, r *common.Comment) (*pb.Classification, error) {
 	cat := predict()
 
-	resp := &pb.Classification{Category: cat}
+	resp := &pb.Classification{
+		ServiceVersion: "a0random",
+		Category:       cat,
+	}
+
 	return resp, nil
 }
 

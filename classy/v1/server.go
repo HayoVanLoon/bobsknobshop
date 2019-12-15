@@ -119,7 +119,6 @@ func (s *server) ClassifyComment(ctx context.Context, r *commonpb.Comment) (resp
 
 	resp.Name = "classy.bobsknobshop.gl/classifications/" + uuid.New().String()
 	resp.CreatedOn = time.Now().Unix()
-	resp.ServiceVersion = v.name
 	resp.Comment = r.GetName()
 
 	// TODO: store in separate system, this breaks in multi-instance settings
