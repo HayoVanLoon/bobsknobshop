@@ -37,6 +37,10 @@ update-deps:
 build:
 	docker build -t $(IMAGE_NAME) .
 
+deploy:
+	# TODO: create & deploy Secret
+	kubectl apply -f deploy-service.yaml
+
 run:
 	go run server.go \
 		-port=$(LOCAL_PORT)

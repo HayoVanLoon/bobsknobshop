@@ -21,6 +21,7 @@ IMAGE_NAME := $(PROJECT_NAME)_$(MODULE_NAME)_$(VERSION)
 TAG := latest
 
 LOCAL_PORT := 9010
+NODE_PORT := 30100
 
 .PHONY:
 
@@ -35,6 +36,11 @@ test:
 
 build:
 	docker build -t $(IMAGE_NAME) .
+
+build-all: build
+
+deploy:
+	kubectl apply -f deploy-service.yaml
 
 run:
 	go run server.go \
@@ -55,7 +61,8 @@ docker-run:
 test-minikube:
 	go run client/client.go \
 		-host=$(shell minikube ip) \
-		-port=$(NODE_PORT)
+		-port=$(NODE_PORT) \
+		-file=$(shell echo $$PWD)/../../example/comments.csv
 
 push-gcr:
 	docker tag $(IMAGE_NAME) gcr.io/$(PROJECT_ID)/$(IMAGE_NAME):$(TAG)

@@ -36,8 +36,8 @@ import (
 
 const (
 	defaultPort       = 9000
-	defaultCcHost     = "commentcentre-service"
-	defaultClassyHost = "classy-service"
+	defaultCcHost     = "commentcentre-v1-service"
+	defaultClassyHost = "classy-v1-service"
 )
 
 func readCommentsFile(fileName string) [][]string {

@@ -36,8 +36,7 @@ import (
 
 const (
 	defaultPort        = 9000
-	defaultPeddlerHost = "peddlerService-service"
-	emoThreshold       = 0.1
+	defaultPeddlerHost = "peddler-v1-service"
 )
 
 type server struct {

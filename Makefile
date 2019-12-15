@@ -29,8 +29,10 @@ protoc:
 
 update-deps: update-deps-classy update-deps-commentcentre update-deps-peddler update-deps-truth
 
+build-all: build-all-classy build-all-commentcentre build-all-peddler build-all-truth
 
 # Module-Specific Recipes
+
 
 # Classy
 run-classy:
@@ -41,6 +43,9 @@ update-deps-classy:
 
 smoke-test-classy:
 	@$(MAKE) -C classy smoke-test
+
+build-all-classy:
+	@$(MAKE) -C classy build-all
 
 
 # Comment Centre
@@ -53,6 +58,10 @@ update-deps-commentcentre:
 smoke-test-commentcentre:
 	@$(MAKE) -C commentcentre smoke-test
 
+build-all-commentcentre:
+	@$(MAKE) -C commentcentre build-all
+
+
 # Peddler
 run-peddler:
 	$(MAKE) -C peddler run
@@ -62,6 +71,9 @@ update-deps-peddler:
 
 smoke-test-peddler:
 	@$(MAKE) -C peddler smoke-test
+
+build-all-peddler:
+	@$(MAKE) -C peddler build-all
 
 
 # Truth
@@ -76,3 +88,6 @@ update-deps-truth:
 
 smoke-test-truth:
 	@$(MAKE) -C truth smoke-test
+
+build-all-truth:
+	@$(MAKE) -C truth build-all

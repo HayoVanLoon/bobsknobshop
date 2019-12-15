@@ -34,7 +34,7 @@ import (
 
 const (
 	defaultPort       = 9000
-	defaultClassyHost = "classy-service"
+	defaultClassyHost = "classy-v1-service"
 )
 
 type server struct {

@@ -33,6 +33,9 @@ test:
 build:
 	docker build -t $(IMAGE_NAME) .
 
+deploy:
+	kubectl apply -f deploy-service.yaml
+
 update-deps:
 	go get -u ./...
 

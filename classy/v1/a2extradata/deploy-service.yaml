@@ -18,7 +18,7 @@ metadata:
   name: classy-v1-a2extradata-service
   labels:
     serviceGroup: classy
-    internalService: true
+    internalService: internal
     subversion: a2extradata
 spec:
   type: ClusterIP

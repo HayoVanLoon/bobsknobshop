@@ -31,5 +31,6 @@ FROM alpine
 RUN apk --update --no-cache add ca-certificates openssl
 
 COPY --from=builder /build/app /usr/local/bin
+COPY --from=builder /build/comments.csv /var/truth/
 
-CMD ["/usr/local/bin/app"]
+CMD ["/usr/local/bin/app", "-file=/var/truth/comments.csv"]

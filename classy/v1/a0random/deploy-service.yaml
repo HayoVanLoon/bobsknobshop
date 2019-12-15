@@ -18,7 +18,7 @@ metadata:
   name: classy-v1-a0random-service
   labels:
     serviceGroup: classy
-    internalService: true
+    internalService: internal
     subversion: a0random
 spec:
   type: ClusterIP
@@ -27,6 +27,7 @@ spec:
   ports:
     - protocol: TCP
       port: 9000
+      targetPort: 9000
 
 ---
 

@@ -31,5 +31,6 @@ FROM alpine
 RUN apk --update --no-cache add ca-certificates openssl
 
 COPY --from=builder /build/app /usr/local/bin
+COPY --from=builder /build/order-data.json /var/peddler/
 
-CMD ["/usr/local/bin/app"]
+CMD ["/usr/local/bin/app", "-file=/var/peddler/order-data.json"]

@@ -21,6 +21,7 @@ IMAGE_NAME := $(PROJECT_NAME)_$(MODULE_NAME)_$(VERSION)
 TAG := latest
 
 LOCAL_PORT := 9030
+NODE_PORT := 30300
 
 .PHONY:
 
@@ -34,7 +35,13 @@ test:
 	@echo TODO
 
 build:
+	cp ../../example/comments.csv .
 	docker build -t $(IMAGE_NAME) .
+
+build-all: build
+
+deploy:
+	kubectl apply -f deploy-service.yaml
 
 run:
 	go run server.go \

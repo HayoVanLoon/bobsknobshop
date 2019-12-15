@@ -1,0 +1,9 @@
+*.iml
+
+*/secrets
+
+Makefile
+Dockerfile
+
+deploy-service.yaml
+client/

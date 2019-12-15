@@ -34,7 +34,13 @@ test:
 	@echo TODO
 
 build:
+	cp $(PWD)/../../example/order-data.json .
 	docker build -t $(IMAGE_NAME) .
+
+build-all: build
+
+deploy:
+	kubectl apply -f deploy-service.yaml
 
 run:
 	go run server.go \

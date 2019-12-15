@@ -31,5 +31,6 @@ FROM alpine
 RUN apk --update --no-cache add ca-certificates openssl
 
 COPY --from=builder /build/app /usr/local/bin
+COPY --from=builder /build/subs-k8s.csv /var/classy/
 
-CMD ["/usr/local/bin/app"]
+CMD ["/usr/local/bin/app", "-subs-file=/var/classy/subs-k8s.csv"]

@@ -64,7 +64,7 @@ func readSubsFile(file string) []versionConfig {
 		if row[2] != "" {
 			ta = row[1] + ":" + row[2]
 		} else {
-			ta = row[1]
+			ta = row[1] + ":" + strconv.Itoa(defaultPort)
 		}
 		tr, err := strconv.Atoi(row[3])
 		if err != nil {

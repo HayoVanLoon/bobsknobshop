@@ -25,7 +25,7 @@ spec:
   ports:
     - protocol: TCP
       port: 9000
-      nodePort: 30200
+      nodePort: 30300
 
 ---
 

@@ -21,6 +21,7 @@ IMAGE_NAME := $(PROJECT_NAME)_$(MODULE_NAME)_$(VERSION)
 TAG := latest
 
 LOCAL_PORT := 9000
+NODE_PORT := 30001
 
 .PHONY:
 
@@ -36,6 +37,19 @@ test:
 build:
 	docker build -t $(IMAGE_NAME) .
 
+build-all: build
+	make -C a0random build
+	make -C a1basic build
+	make -C a2extradata build
+	# make -C a3nlp build
+
+deploy:
+	make -C a0random deploy
+	make -C a1basic deploy
+	make -C a2extradata deploy
+	# make -C a3nlp deploy
+	kubectl apply -f deploy-service.yaml
+
 run:
 	go run server.go \
 		-port=$(LOCAL_PORT)
@@ -46,10 +60,10 @@ smoke-test:
 
 update-deps:
 	go get -u ./...
-	@$(MAKE) -C a0random update-deps
-	@$(MAKE) -C a1basic update-deps
-	@$(MAKE) -C a2extradata update-deps
-	@$(MAKE) -C a3nlp update-deps
+	@make -C a0random update-deps
+	@make -C a1basic update-deps
+	@make -C a2extradata update-deps
+	@make -C a3nlp update-deps
 
 docker-run:
 	docker run --network="host" $(IMAGE_NAME) \

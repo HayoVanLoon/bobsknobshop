@@ -78,3 +78,9 @@ update-deps:
 
 smoke-test:
 	@$(MAKE) -C $(CURRENT_VERSION) smoke-test
+
+build-all:
+	@$(MAKE) -C $(CURRENT_VERSION) build-all
+
+deploy:
+	@$(MAKE) -C $(CURRENT_VERSION) deploy
