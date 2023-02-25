@@ -1,6 +1,6 @@
 module github.com/HayoVanLoon/bobsknobshop/truth/v1
 
-go 1.13
+go 1.20
 
 require (
 	github.com/HayoVanLoon/genproto v0.0.0-20191110142622-abff02d4b8eb
